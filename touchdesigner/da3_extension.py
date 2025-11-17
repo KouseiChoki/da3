@@ -8,6 +8,13 @@ Usage:
 2. Add this script as Text DAT named 'DepthAnything3Ext'
 3. Set Extension Object parameter to: op('./DepthAnything3Ext').module.DepthAnything3Ext(me)
 4. Extension will set up all parameters and provide control methods
+
+Resolution TOP Setup (for aspect-aware downsampling):
+1. Create Resolution TOP named 'resolution_preprocess'
+2. Set Resolution -> Resolution to 'Custom'
+3. Width Expression: parent().ext.DepthAnything3Ext.GetProcessResWidth()
+4. Height Expression: parent().ext.DepthAnything3Ext.GetProcessResHeight()
+5. Wire: [video source] -> resolution_preprocess -> in_video
 """
 
 
@@ -54,13 +61,13 @@ class DepthAnything3Ext:
 
         # Input section
         p = page.appendInt('Frameskip', label='Frame Skip (N)')
-        p[0].default = 1
-        p[0].min = 1
+        p[0].default = 0
+        p[0].min = 0
         p[0].max = 10
         p[0].clampMin = True
         p[0].clampMax = True
         p[0].startSection = True
-        p[0].val = 1
+        p[0].val = 0
 
         p = page.appendToggle('Usenumpy', label='Send as Numpy')
         p[0].default = True
@@ -234,6 +241,20 @@ class DepthAnything3Ext:
         else:
             print("WARNING: websocket1 DAT not found - create it and reconnect")
 
+    def onPulse(self, par):
+        """
+        Called when a pulse parameter is triggered.
+
+        Args:
+            par: The parameter that was pulsed
+        """
+        if par.name == 'Reconnect':
+            self.Reconnect()
+        elif par.name == 'Restartbackend':
+            self.RestartBackend()
+        elif par.name == 'Stopbackend':
+            self.StopBackend()
+
     def Reconnect(self):
         """
         Reconnect WebSocket with current parameters.
@@ -269,3 +290,49 @@ class DepthAnything3Ext:
             control_dat.module.stop_backend(self.ownerComp)
         else:
             print("ERROR: da3_stream_control DAT not found")
+
+    def GetProcessResWidth(self):
+        """
+        Get process resolution width respecting input aspect ratio.
+        Call from expression: parent().ext.DepthAnything3Ext.GetProcessResWidth()
+        """
+        process_res_idx = self.ownerComp.par.Processres.eval()
+        process_res_values = [252, 378, 504, 756, 1008]
+        process_res = process_res_values[process_res_idx] if 0 <= process_res_idx < len(process_res_values) else 252
+
+        # Get input aspect ratio from in_video
+        in_video = self.ownerComp.op('in_video')
+        if not in_video:
+            return process_res
+
+        aspect = in_video.width / in_video.height if in_video.height > 0 else 1.0
+
+        if aspect > 1.0:
+            # Landscape: width is limiting dimension
+            return process_res
+        else:
+            # Portrait: scale width by aspect
+            return int(process_res * aspect)
+
+    def GetProcessResHeight(self):
+        """
+        Get process resolution height respecting input aspect ratio.
+        Call from expression: parent().ext.DepthAnything3Ext.GetProcessResHeight()
+        """
+        process_res_idx = self.ownerComp.par.Processres.eval()
+        process_res_values = [252, 378, 504, 756, 1008]
+        process_res = process_res_values[process_res_idx] if 0 <= process_res_idx < len(process_res_values) else 252
+
+        # Get input aspect ratio from in_video
+        in_video = self.ownerComp.op('in_video')
+        if not in_video:
+            return process_res
+
+        aspect = in_video.width / in_video.height if in_video.height > 0 else 1.0
+
+        if aspect > 1.0:
+            # Landscape: scale height by aspect
+            return int(process_res / aspect)
+        else:
+            # Portrait: height is limiting dimension
+            return process_res

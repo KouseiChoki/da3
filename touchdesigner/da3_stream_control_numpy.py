@@ -96,20 +96,29 @@ def restart_backend(comp):
 
     # Build command
     backend_path = comp.par.Backendpath.eval()
-    model = comp.par.Model.eval()
-    device = comp.par.Device.eval()
+    model_idx = comp.par.Model.eval()
+    device_idx = comp.par.Device.eval()
     port = comp.par.Backendport.eval()
-    process_res = int(comp.par.Processres.eval())  # Convert menu selection to int
+    process_res_idx = comp.par.Processres.eval()
 
-    # Map model menu to actual model directory
-    model_map = {
+    # Map menu indices to values
+    model_names = ['DA3-SMALL', 'DA3-BASE', 'DA3-LARGE', 'DA3-GIANT', 'DA3NESTED-GIANT-LARGE']
+    device_names = ['mps', 'cuda', 'cpu']
+    process_res_values = [252, 378, 504, 756, 1008]
+
+    model_dir_map = {
         'DA3-SMALL': 'depth-anything/DA3-SMALL',
         'DA3-BASE': 'depth-anything/DA3-BASE',
         'DA3-LARGE': 'depth-anything/DA3-LARGE',
         'DA3-GIANT': 'depth-anything/DA3-GIANT',
         'DA3NESTED-GIANT-LARGE': 'depth-anything/DA3NESTED-GIANT-LARGE'
     }
-    model_dir = model_map.get(model, comp.par.Modeldir.eval())
+
+    model_name = model_names[model_idx] if 0 <= model_idx < len(model_names) else 'DA3-SMALL'
+    device = device_names[device_idx] if 0 <= device_idx < len(device_names) else 'mps'
+    process_res = process_res_values[process_res_idx] if 0 <= process_res_idx < len(process_res_values) else 252
+
+    model_dir = model_dir_map.get(model_name, comp.par.Modeldir.eval())
 
     # Activate venv and run da3 stream
     activate_script = os.path.join(backend_path, '.venv', 'bin', 'activate')

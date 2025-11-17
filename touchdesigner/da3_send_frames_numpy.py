@@ -51,12 +51,13 @@ def send_frame():
     # Get frame skip setting from parent
     frame_skip = comp.par.Frameskip.eval()
 
-    # Check if we should skip this frame
-    frame_counter = comp.fetch('frame_counter', 0)
-    comp.store('frame_counter', frame_counter + 1)
+    # Check if we should skip this frame (only if frame_skip > 0)
+    if frame_skip > 0:
+        frame_counter = comp.fetch('frame_counter', 0)
+        comp.store('frame_counter', frame_counter + 1)
 
-    if frame_counter % frame_skip != 0:
-        return  # Skip this frame
+        if frame_counter % (frame_skip + 1) != 0:
+            return  # Skip this frame
 
     # Check if WebSocket is connected
     if not websocket_dat.par.active.eval():
@@ -76,6 +77,7 @@ def send_frame():
             try:
                 frame_array = source_top.numpyArray(delayed=False)
                 # TouchDesigner returns (height, width, channels) in float32 [0, 1]
+
                 # Convert to uint8 [0, 255]
                 frame_uint8 = (frame_array * 255).astype(np.uint8)
 
