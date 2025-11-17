@@ -1,0 +1,1419 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Streaming Benchmark - Benchmark Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .header .timestamp {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .metric-good {
+            color: #28a745;
+        }
+
+        .metric-warning {
+            color: #ffc107;
+        }
+
+        .metric-bad {
+            color: #dc3545;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .scenario-details {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .scenario-details h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .comparison-note {
+            background: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+    </style>
+</head>
+<body>
+    
+        <div class="header">
+            <h1>📊 Comprehensive Streaming Benchmark</h1>
+            <div class="subtitle">Full benchmark testing models across resolutions with proper divisibility</div>
+            <div class="timestamp">Generated: 2025-11-17 15:27:15</div>
+        </div>
+        
+    <div class="container">
+        
+        <div class="section">
+            <h2>📈 Performance Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Avg FPS</th>
+                        <th>Avg Latency (ms)</th>
+                        <th>P95 Latency (ms)</th>
+                        <th>Avg Memory (MB)</th>
+                        <th>Peak Memory (MB)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td><strong>DA3-SMALL_252</strong></td>
+                <td class="metric-value">64.46</td>
+                <td>14.45</td>
+                <td>83.36</td>
+                <td>130.90</td>
+                <td>130.90</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_378</strong></td>
+                <td class="metric-value">36.27</td>
+                <td>26.00</td>
+                <td>196.88</td>
+                <td>130.96</td>
+                <td>130.97</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504</strong></td>
+                <td class="metric-value">17.40</td>
+                <td>56.00</td>
+                <td>449.19</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_756</strong></td>
+                <td class="metric-value">1.55</td>
+                <td>633.41</td>
+                <td>2917.15</td>
+                <td>131.34</td>
+                <td>131.40</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-BASE_252</strong></td>
+                <td class="metric-value">37.13</td>
+                <td>25.90</td>
+                <td>179.44</td>
+                <td>516.72</td>
+                <td>516.76</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-BASE_504</strong></td>
+                <td class="metric-value">8.09</td>
+                <td>120.63</td>
+                <td>981.41</td>
+                <td>516.78</td>
+                <td>516.83</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_sample2</strong></td>
+                <td class="metric-value">17.25</td>
+                <td>49.28</td>
+                <td>456.66</td>
+                <td>131.04</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_sample5</strong></td>
+                <td class="metric-value">16.45</td>
+                <td>54.23</td>
+                <td>475.81</td>
+                <td>130.96</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_win1</strong></td>
+                <td class="metric-value">17.65</td>
+                <td>55.34</td>
+                <td>444.71</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_win4</strong></td>
+                <td class="metric-value">22.86</td>
+                <td>42.06</td>
+                <td>447.71</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_win8</strong></td>
+                <td class="metric-value">21.81</td>
+                <td>42.18</td>
+                <td>448.93</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_win16</strong></td>
+                <td class="metric-value">13.64</td>
+                <td>69.66</td>
+                <td>454.47</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504_win32</strong></td>
+                <td class="metric-value">2.10</td>
+                <td>472.11</td>
+                <td>543.91</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-LARGE_252</strong></td>
+                <td class="metric-value">15.22</td>
+                <td>63.64</td>
+                <td>520.69</td>
+                <td>1567.87</td>
+                <td>1567.90</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-GIANT_252</strong></td>
+                <td class="metric-value">5.04</td>
+                <td>192.93</td>
+                <td>1477.04</td>
+                <td>5171.50</td>
+                <td>5171.51</td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        
+        <div class="section">
+            <h2>🔍 At-a-Glance Comparison</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="comparisonFpsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonTemporalChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonStabilityChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonLatencyMemoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="section">
+            <h2>📊 Performance Charts</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="fpsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="memoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="frameTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="section">
+            <h2>🔍 Detailed Results</h2>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_252</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 1.55s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">64.46</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">14.5ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">130.9MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0143</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.979</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0076</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_252/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_252/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_252/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_378</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 2.76s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">36.27</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">26.0ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.0MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0262</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.986</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0120</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_378/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_378/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_378/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 5.75s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">17.40</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">56.0ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0098</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.990</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0095</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_756</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 64.47s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">1.55</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">633.4ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.4MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0286</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.988</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0134</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_756/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_756/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_756/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-BASE_252</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 2.69s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">37.13</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">25.9ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">516.8MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0138</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.985</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0087</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-BASE_252/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-BASE_252/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-BASE_252/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-BASE_504</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 12.36s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">8.09</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">120.6ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">516.8MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0163</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.988</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0117</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-BASE_504/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-BASE_504/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-BASE_504/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_sample2</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 50 | <strong>Time:</strong> 2.90s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">17.25</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">49.3ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0077</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.983</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0154</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_sample2/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_sample2/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504_sample2/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_sample5</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 20 | <strong>Time:</strong> 1.22s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">16.45</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">54.2ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0107</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.971</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0267</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_sample5/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_sample5/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504_sample5/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_win1</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 5.67s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">17.65</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">55.3ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0098</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.990</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0095</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_win1/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_win1/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504_win1/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_win4</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 4.37s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">22.86</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">42.1ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0089</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.990</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0090</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_win4/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_win4/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504_win4/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_win8</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 4.59s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">21.81</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">42.2ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0115</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.989</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0096</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_win8/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_win8/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504_win8/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_win16</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 7.33s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">13.64</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">69.7ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0088</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.990</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0093</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_win16/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_win16/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-SMALL_504_win16/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504_win32</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 47.69s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">2.10</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">472.1ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0076</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.988</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0111</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-SMALL_504_win32/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-SMALL_504_win32/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-LARGE_252</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 6.57s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">15.22</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">63.6ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">1567.9MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0098</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.989</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0091</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-LARGE_252/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-LARGE_252/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-LARGE_252/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-GIANT_252</h3>
+                <p><strong>Device:</strong> mps | <strong>Frames:</strong> 100 | <strong>Time:</strong> 19.84s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">5.04</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">192.9ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">5171.5MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">0.0185</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">0.986</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">0.0111</div>
+                </div>
+            </div>
+            
+                
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="DA3-GIANT_252/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Sample Frames</h4>
+                <img src="DA3-GIANT_252/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="DA3-GIANT_252/comparison.mp4" type="video/mp4">
+                </video>
+                
+            </div>
+            
+        </div>
+        
+    </div>
+    <script>
+        
+        // Comparison Charts
+        new Chart(document.getElementById('comparisonFpsChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"],
+                datasets: [{
+                    label: 'FPS',
+                    data: [64.45839661139998, 36.274782403837065, 17.40257473882782, 1.5512070171311998, 37.13224895076244, 8.089186752361345, 17.25353929017486, 16.452444740816286, 17.647241970497834, 22.863817567591507, 21.807317046413516, 13.638175513458464, 2.0967949787189735, 15.217504013171585, 5.040100017945493],
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'FPS Comparison',
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Frames Per Second' }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('comparisonTemporalChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"],
+                datasets: [
+                    {
+                        label: 'Smoothness (higher = better)',
+                        data: [0.9794595266171019, 0.9859807947498141, 0.989580262032433, 0.9875896720615905, 0.9853587665499545, 0.9880173308969434, 0.9829304220599172, 0.9705181868949384, 0.989580262032433, 0.9901189171642185, 0.9894229928876538, 0.9899009884087862, 0.9877263814719622, 0.989423785720075, 0.9859419421463713],
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Jitter (lower = better)',
+                        data: [0.014266109094023705, 0.026227576658129692, 0.009769787080585957, 0.02857738919556141, 0.013760073110461235, 0.016267908737063408, 0.007743468042463064, 0.010650119744241238, 0.009769787080585957, 0.008935933001339436, 0.011477285996079445, 0.008770777843892574, 0.00759689137339592, 0.009763729758560658, 0.018515456467866898],
+                        backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 2,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Temporal Consistency (Dual Axis)',
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        title: { display: true, text: 'Smoothness' },
+                        grid: { drawOnChartArea: true }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        title: { display: true, text: 'Jitter' },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('comparisonStabilityChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"],
+                datasets: [{
+                    label: 'Flicker Score (lower = better)',
+                    data: [0.007571800897011952, 0.011964735646295, 0.009541921821251815, 0.013413908919889708, 0.008716597364341118, 0.01173488866556816, 0.01539219521995013, 0.026675235480070114, 0.009541921821251815, 0.009005295407331112, 0.0096474913880229, 0.009258530596841355, 0.011109991189168424, 0.009074141086098187, 0.01107036487712544],
+                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Stability (Flicker)',
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Flicker Score' }
+                    }
+                }
+            }
+        });
+
+        // Color palette for scenarios
+        const colors = [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(220, 53, 69, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(111, 66, 193, 0.8)',
+            'rgba(23, 162, 184, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(201, 203, 207, 0.8)',
+        ];
+
+        new Chart(document.getElementById('comparisonLatencyMemoryChart'), {
+            type: 'scatter',
+            data: {
+                datasets: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"].map((name, i) => ({
+                    label: name,
+                    data: [{
+                        x: [14.452993869781494, 26.001453399658203, 55.99825382232666, 633.4142851829529, 25.895655155181885, 120.62650918960571, 49.278011322021484, 54.23452854156494, 55.341994762420654, 42.062952518463135, 42.181077003479004, 69.6612548828125, 472.10673332214355, 63.64452838897705, 192.93151378631592][i],
+                        y: [130.896708984375, 130.95559326171875, 131.0674951171875, 131.338232421875, 516.7156079101562, 516.7825317382812, 131.040263671875, 130.9585693359375, 131.0674951171875, 131.0674951171875, 131.0674951171875, 131.0674951171875, 131.0674951171875, 1567.871025390625, 5171.5047924804685][i]
+                    }],
+                    backgroundColor: colors[i % colors.length],
+                    borderColor: colors[i % colors.length].replace('0.8', '1.0'),
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Latency vs Memory',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += 'Latency: ' + context.parsed.x.toFixed(2) + 'ms, ';
+                                label += 'Memory: ' + context.parsed.y.toFixed(2) + 'MB';
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 8,
+                            font: { size: 10 }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Average Latency (ms)' },
+                        beginAtZero: true
+                    },
+                    y: {
+                        title: { display: true, text: 'Average Memory (MB)' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // FPS Chart
+        new Chart(document.getElementById('fpsChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"],
+                datasets: [{
+                    label: 'Average FPS',
+                    data: [64.45839661139998, 36.274782403837065, 17.40257473882782, 1.5512070171311998, 37.13224895076244, 8.089186752361345, 17.25353929017486, 16.452444740816286, 17.647241970497834, 22.863817567591507, 21.807317046413516, 13.638175513458464, 2.0967949787189735, 15.217504013171585, 5.040100017945493],
+                    backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Average FPS Comparison'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'FPS'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Latency Chart
+        new Chart(document.getElementById('latencyChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"],
+                datasets: [
+                    {
+                        label: 'Avg Latency',
+                        data: [14.452993869781494, 26.001453399658203, 55.99825382232666, 633.4142851829529, 25.895655155181885, 120.62650918960571, 49.278011322021484, 54.23452854156494, 55.341994762420654, 42.062952518463135, 42.181077003479004, 69.6612548828125, 472.10673332214355, 63.64452838897705, 192.93151378631592],
+                        backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'P95 Latency',
+                        data: [83.36188793182373, 196.8774437904358, 449.1939187049866, 2917.148625850675, 179.440176486969, 981.409740447998, 456.66019916534424, 475.81298351287853, 444.71216201782227, 447.7140188217163, 448.9314794540405, 454.46934700012207, 543.9102053642273, 520.6854820251465, 1477.0434260368347],
+                        backgroundColor: 'rgba(255, 193, 7, 0.5)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Latency Comparison (ms)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Milliseconds'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Memory Chart
+        new Chart(document.getElementById('memoryChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-SMALL_756", "DA3-BASE_252", "DA3-BASE_504", "DA3-SMALL_504_sample2", "DA3-SMALL_504_sample5", "DA3-SMALL_504_win1", "DA3-SMALL_504_win4", "DA3-SMALL_504_win8", "DA3-SMALL_504_win16", "DA3-SMALL_504_win32", "DA3-LARGE_252", "DA3-GIANT_252"],
+                datasets: [
+                    {
+                        label: 'Avg Memory',
+                        data: [130.896708984375, 130.95559326171875, 131.0674951171875, 131.338232421875, 516.7156079101562, 516.7825317382812, 131.040263671875, 130.9585693359375, 131.0674951171875, 131.0674951171875, 131.0674951171875, 131.0674951171875, 131.0674951171875, 1567.871025390625, 5171.5047924804685],
+                        backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Peak Memory',
+                        data: [130.90283203125, 130.968994140625, 131.0947265625, 131.39892578125, 516.75634765625, 516.83154296875, 131.0947265625, 131.0947265625, 131.0947265625, 131.0947265625, 131.0947265625, 131.0947265625, 131.0947265625, 1567.90185546875, 5171.506591796875],
+                        backgroundColor: 'rgba(111, 66, 193, 0.5)',
+                        borderColor: 'rgba(111, 66, 193, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Memory Usage (MB)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Megabytes'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Frame Time Chart (all scenarios)
+        new Chart(document.getElementById('frameTimeChart'), {
+            type: 'line',
+            data: {
+                labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
+                datasets: [{"label": "DA3-SMALL_252", "data": [0.032901763916015625, 0.0011920928955078125, 0.00476837158203125, 0.0, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0011920928955078125, 498.9328384399414, 0.0019073486328125, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 113.68489265441895, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.0, 83.32705497741699, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.00095367431640625, 83.33992958068848, 0.0016689300537109375, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 84.25402641296387, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0011920928955078125, 0.0, 82.71288871765137, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 83.0392837524414, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0011920928955078125, 83.77909660339355, 0.0019073486328125, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 84.07187461853027, 0.0, 0.0, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0, 82.58199691772461, 0.0007152557373046875, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 82.85903930664062, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 82.6411247253418], "borderColor": "rgba(102, 126, 234, 1)", "backgroundColor": "rgba(102, 126, 234, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_378", "data": [0.0007152557373046875, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 409.96599197387695, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 226.54175758361816, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.0007152557373046875, 0.00095367431640625, 0.0, 0.0, 201.0350227355957, 0.0007152557373046875, 0.00095367431640625, 0.00095367431640625, 0.0007152557373046875, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 193.84503364562988, 0.0021457672119140625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 193.50409507751465, 0.0007152557373046875, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 193.91107559204102, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 193.30596923828125, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 197.30710983276367, 0.0007152557373046875, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 201.06101036071777, 0.00095367431640625, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 196.79880142211914, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 195.97578048706055, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 196.854829788208], "borderColor": "rgba(132, 166, 214, 1)", "backgroundColor": "rgba(132, 166, 214, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504", "data": [0.0021457672119140625, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 667.341947555542, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0011920928955078125, 463.0160331726074, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.00095367431640625, 445.5888271331787, 0.0011920928955078125, 0.0, 0.0, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 442.94118881225586, 0.0016689300537109375, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 453.98974418640137, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0, 445.3921318054199, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0011920928955078125, 439.2218589782715, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0011920928955078125, 441.04886054992676, 0.0007152557373046875, 0.0, 0.0011920928955078125, 0.0007152557373046875, 0.0, 0.00095367431640625, 0.0, 460.5579376220703, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.0, 450.29401779174805, 0.0007152557373046875, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0007152557373046875, 0.0, 0.0, 449.13601875305176, 0.0007152557373046875, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 441.2510395050049], "borderColor": "rgba(162, 206, 194, 1)", "backgroundColor": "rgba(162, 206, 194, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_756", "data": [0.00095367431640625, 0.0, 0.0, 0.0, 0.0007152557373046875, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.0, 6825.03604888916, 0.010013580322265625, 0.0007152557373046875, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.005245208740234375, 12524.866104125977, 0.010967254638671875, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 11178.492069244385, 0.0209808349609375, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 2798.513889312744, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0019073486328125, 0.00095367431640625, 2414.6170616149902, 0.0030994415283203125, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 1784.2230796813965, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 2650.1832008361816, 0.00476837158203125, 0.0, 0.0021457672119140625, 0.0011920928955078125, 0.0, 0.0, 0.0, 2877.747058868408, 0.009775161743164062, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 1844.4669246673584, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 3665.778398513794, 0.0069141387939453125, 0.00095367431640625, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 11954.444169998169, 0.18525123596191406, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 2822.7689266204834], "borderColor": "rgba(192, 246, 174, 1)", "backgroundColor": "rgba(192, 246, 174, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-BASE_252", "data": [0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0011920928955078125, 0.0007152557373046875, 0.0, 0.0, 0.0, 397.11689949035645, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 188.61699104309082, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 376.7678737640381, 0.00286102294921875, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.00095367431640625, 0.0, 179.43382263183594, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 177.50811576843262, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 178.59411239624023, 0.0007152557373046875, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 179.56089973449707, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 199.30601119995117, 0.0019073486328125, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 178.9991855621338, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 177.94179916381836, 0.0021457672119140625, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 177.34217643737793, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 178.33924293518066], "borderColor": "rgba(222, 157, 154, 1)", "backgroundColor": "rgba(222, 157, 154, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-BASE_504", "data": [0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0007152557373046875, 0.00095367431640625, 0.00095367431640625, 0.0011920928955078125, 0.0, 1268.2056427001953, 0.0007152557373046875, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 981.4016819000244, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 980.499267578125, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 976.5491485595703, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 978.4400463104248, 0.0021457672119140625, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.0, 0.0, 982.417106628418, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 977.3378372192383, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 975.6710529327393, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 976.6757488250732, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0011920928955078125, 981.5628528594971, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0011920928955078125, 989.9439811706543, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 993.9010143280029], "borderColor": "rgba(252, 197, 224, 1)", "backgroundColor": "rgba(252, 197, 224, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_sample2", "data": [0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 637.8271579742432, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.0, 0.0, 462.3072147369385, 0.0019073486328125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 453.6318778991699, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 450.9730339050293, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 459.1379165649414, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.00095367431640625], "borderColor": "rgba(129, 237, 204, 1)", "backgroundColor": "rgba(129, 237, 204, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_sample5", "data": [0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 616.2610054016113, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 0.0011920928955078125, 0.00095367431640625, 468.42098236083984], "borderColor": "rgba(159, 148, 184, 1)", "backgroundColor": "rgba(159, 148, 184, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_win1", "data": [0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0011920928955078125, 0.0, 630.4531097412109, 0.0011920928955078125, 0.0, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 449.66602325439453, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0, 440.8609867095947, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 440.1390552520752, 0.0019073486328125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 440.86718559265137, 0.00095367431640625, 0.0007152557373046875, 0.0, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 439.5413398742676, 0.00095367431640625, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 444.6070194244385, 0.0021457672119140625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0011920928955078125, 446.70987129211426, 0.0019073486328125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 444.5159435272217, 0.00095367431640625, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 444.5359706878662, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 460.5860710144043, 0.0016689300537109375, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0, 0.0, 451.6751766204834], "borderColor": "rgba(189, 188, 164, 1)", "backgroundColor": "rgba(189, 188, 164, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_win4", "data": [0.0021457672119140625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 620.9409236907959, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 447.6940631866455, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 444.75412368774414, 0.0019073486328125, 0.0011920928955078125, 0.0007152557373046875, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.0, 450.4110813140869, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0011920928955078125, 448.0931758880615, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 446.486234664917, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0011920928955078125, 0.0, 446.46215438842773, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0, 450.0861167907715, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 451.3230323791504], "borderColor": "rgba(219, 228, 234, 1)", "backgroundColor": "rgba(219, 228, 234, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_win8", "data": [0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 621.1979389190674, 0.0011920928955078125, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.00095367431640625, 457.44800567626953, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 449.1448402404785, 0.00095367431640625, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.0, 448.92024993896484, 0.00095367431640625, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0011920928955078125, 0.0, 449.1751194000244, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 449.50389862060547, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 447.7097988128662, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 446.7349052429199, 0.0011920928955078125, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 448.23598861694336, 0.00095367431640625, 0.0007152557373046875, 0.00095367431640625, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625], "borderColor": "rgba(249, 139, 214, 1)", "backgroundColor": "rgba(249, 139, 214, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_win16", "data": [0.0011920928955078125, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 635.206937789917, 0.0007152557373046875, 0.0, 0.0, 0.0, 0.0, 457.51404762268066, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 449.08905029296875, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 447.4830627441406, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 450.7620334625244, 0.00095367431640625, 0.0, 0.0007152557373046875, 0.0, 0.00095367431640625, 447.68524169921875, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 447.551965713501, 0.0007152557373046875, 0.0011920928955078125, 0.0, 0.0, 0.0, 447.7429389953613, 0.0011920928955078125, 0.0, 0.0007152557373046875, 0.00095367431640625, 0.0, 461.12680435180664, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 450.653076171875, 0.00095367431640625, 0.0, 0.0, 0.0, 0.00095367431640625, 454.46300506591797, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 0.0, 453.45187187194824, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0, 0.0, 452.3437023162842, 0.0019073486328125, 0.0, 0.0, 0.0, 0.0, 454.58984375, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 456.4249515533447, 0.0011920928955078125, 0.0, 0.0, 0.0], "borderColor": "rgba(126, 179, 194, 1)", "backgroundColor": "rgba(126, 179, 194, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-SMALL_504_win32", "data": [0.0021457672119140625, 0.0, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 643.153190612793, 612.5040054321289, 519.2921161651611, 515.5839920043945, 512.49098777771, 516.4470672607422, 517.6928043365479, 520.7009315490723, 518.4071063995361, 522.3989486694336, 539.5309925079346, 522.5467681884766, 528.9740562438965, 527.1260738372803, 527.5487899780273, 526.5910625457764, 539.4980907440186, 530.6501388549805, 531.2860012054443, 528.4028053283691, 527.1542072296143, 534.7762107849121, 535.9838008880615, 529.1378498077393, 524.522066116333, 525.4919528961182, 526.8511772155762, 525.7358551025391, 527.3191928863525, 528.8050174713135, 532.3269367218018, 537.8329753875732, 533.0331325531006, 529.975175857544, 527.777910232544, 531.782865524292, 530.0548076629639, 527.7829170227051, 530.4582118988037, 530.980110168457, 534.8410606384277, 530.3530693054199, 527.3652076721191, 528.4721851348877, 528.1639099121094, 527.9049873352051, 545.38893699646, 544.140100479126, 543.8981056213379, 535.3002548217773, 537.6591682434082, 531.7020416259766, 529.3381214141846, 527.9419422149658, 527.0559787750244, 527.7061462402344, 529.630184173584, 528.7649631500244, 527.2445678710938, 526.3321399688721, 523.7290859222412, 524.4059562683105, 524.0929126739502, 524.8749256134033, 528.5980701446533, 530.2917957305908, 527.1899700164795, 521.0070610046387, 522.8321552276611, 523.0510234832764, 525.4302024841309, 527.0278453826904, 525.0790119171143, 523.1969356536865, 525.5310535430908, 524.6708393096924, 524.695873260498, 528.7520885467529, 528.5181999206543, 535.7229709625244, 525.9559154510498, 521.6567516326904, 524.6977806091309, 520.9550857543945, 524.8990058898926, 529.3731689453125, 547.5010871887207, 530.3089618682861, 528.8088321685791], "borderColor": "rgba(156, 219, 174, 1)", "backgroundColor": "rgba(156, 219, 174, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-LARGE_252", "data": [0.0021457672119140625, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0007152557373046875, 0.0, 0.0, 0.0, 0.0, 652.7957916259766, 0.0011920928955078125, 0.00095367431640625, 0.0007152557373046875, 0.0011920928955078125, 0.00095367431640625, 0.0011920928955078125, 0.00095367431640625, 516.4086818695068, 0.0007152557373046875, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 538.1770133972168, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0007152557373046875, 510.99419593811035, 0.0019073486328125, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 509.53197479248047, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 513.2489204406738, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 0.0007152557373046875, 0.0, 517.0168876647949, 0.0021457672119140625, 0.0, 0.0, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.0, 519.1171169281006, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 521.4519500732422, 0.0019073486328125, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 521.8000411987305, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 520.6451416015625, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 523.2222080230713], "borderColor": "rgba(186, 130, 154, 1)", "backgroundColor": "rgba(186, 130, 154, 0.1)", "borderWidth": 2, "pointRadius": 0.5}, {"label": "DA3-GIANT_252", "data": [0.0007152557373046875, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 2451.597213745117, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 1798.3648777008057, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1895.2598571777344, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 1460.3941440582275, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 1498.4118938446045, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.0, 1450.835943222046, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 1464.4339084625244, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 0.0011920928955078125, 1475.9187698364258, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.00095367431640625, 1513.6749744415283, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1409.4998836517334, 0.00095367431640625, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0, 0.0, 1462.0771408081055, 0.0007152557373046875, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 0.00095367431640625, 1412.6520156860352], "borderColor": "rgba(216, 170, 224, 1)", "backgroundColor": "rgba(216, 170, 224, 0.1)", "borderWidth": 2, "pointRadius": 0.5}]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Frame Processing Time (All Scenarios)'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 8,
+                            font: { size: 10 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Time (ms)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Frame Index'
+                        }
+                    }
+                }
+            }
+        });
+        
+    </script>
+</body>
+</html>

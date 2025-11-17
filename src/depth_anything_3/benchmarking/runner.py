@@ -192,10 +192,22 @@ class BenchmarkRunner:
             scenario.num_cameras,
         )
 
-        print(f"📹 Loaded {len(frames)} test frames")
-        print(f"🎯 Resolution: {scenario.resolution}")
+        # Sample frames if configured
+        if scenario.sample_every_n_frames > 1:
+            frames = frames[::scenario.sample_every_n_frames]
+            print(f"📹 Loaded {len(frames)} test frames (sampled every {scenario.sample_every_n_frames} frames)")
+        else:
+            print(f"📹 Loaded {len(frames)} test frames")
+
+        print(f"🎯 Input Resolution: {frames[0].shape[1]}x{frames[0].shape[0]} (upper bound: {scenario.resolution})")
+        print(f"⚙️  Model Process Resolution: {scenario.process_res}")
+        print(f"🔧 Device: {scenario.device}")
         print(f"📷 Cameras: {scenario.num_cameras}")
         print(f"🔢 Precision: {scenario.precision}")
+        if scenario.sample_every_n_frames > 1:
+            print(f"⏭️  Frame Sampling: Every {scenario.sample_every_n_frames} frames")
+        print(f"🪟 Window Size: {scenario.stream_config.window_size}")
+        print(f"🔄 Overlap: {scenario.stream_config.overlap}")
 
         # Check if pose estimation is enabled
         if scenario.test_pose_estimation or scenario.test_pose_conditioned:
@@ -246,6 +258,7 @@ class BenchmarkRunner:
                     model=model,
                     device=scenario.device,
                     config=stream_config,
+                    process_res=scenario.process_res,
                 )
 
                 # Warmup
@@ -286,6 +299,9 @@ class BenchmarkRunner:
 
                 del estimator
 
+        # Calculate temporal consistency metrics
+        self._calculate_temporal_metrics(depth_maps, metrics)
+
         # Save depth maps if requested
         if scenario.save_depth_maps:
             self._save_depth_maps(depth_maps, scenario_dir)
@@ -293,6 +309,9 @@ class BenchmarkRunner:
         # Save comparison video if requested
         if scenario.save_comparison_video:
             self._save_comparison_video(frames, depth_maps, scenario_dir)
+
+        # Save temporal analysis
+        self._save_temporal_analysis(depth_maps, scenario_dir)
 
         # Save metrics
         self._save_metrics(metrics, scenario_dir)
@@ -421,7 +440,13 @@ class BenchmarkRunner:
                     continue
 
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, resolution)
+                # Resize preserving aspect ratio (resolution is upper bound)
+                h, w = frame.shape[:2]
+                target_w, target_h = resolution
+                scale = min(target_w / w, target_h / h)
+                new_w = int(w * scale)
+                new_h = int(h * scale)
+                frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 frames.append(frame)
                 frame_count += 1
 
@@ -436,7 +461,13 @@ class BenchmarkRunner:
                 img_path = image_files[i % len(image_files)]
                 frame = cv2.imread(str(img_path))
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, resolution)
+                # Resize preserving aspect ratio (resolution is upper bound)
+                h, w = frame.shape[:2]
+                target_w, target_h = resolution
+                scale = min(target_w / w, target_h / h)
+                new_w = int(w * scale)
+                new_h = int(h * scale)
+                frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 frames.append(frame)
 
         else:
@@ -675,3 +706,100 @@ class BenchmarkRunner:
             f.write(f"  Z: [{positions[:, 2].min():.3f}, {positions[:, 2].max():.3f}] m\n")
 
         print(f"📊 Saved pose statistics to {stats_path}")
+
+    def _calculate_temporal_metrics(
+        self, depth_maps: List[np.ndarray], metrics: BenchmarkMetrics
+    ):
+        """Calculate temporal consistency metrics from depth sequence."""
+        if len(depth_maps) < 2:
+            return
+
+        # Calculate frame-to-frame differences
+        diffs = []
+        for i in range(len(depth_maps) - 1):
+            d1 = depth_maps[i]
+            d2 = depth_maps[i + 1]
+            diff = np.abs(d2 - d1)
+            diffs.append(np.mean(diff))
+
+        diffs = np.array(diffs)
+
+        # Temporal jitter: std dev of changes
+        metrics.temporal_jitter = float(np.std(diffs))
+
+        # Temporal smoothness: 1 - normalized mean diff
+        metrics.temporal_smoothness = float(1.0 - (np.mean(diffs) / (np.mean([d.max() - d.min() for d in depth_maps]) + 1e-6)))
+
+        # Flicker score: high-frequency changes
+        # Compare every other frame to detect rapid oscillations
+        if len(depth_maps) >= 3:
+            flickers = []
+            for i in range(0, len(depth_maps) - 2, 2):
+                d1 = depth_maps[i]
+                d2 = depth_maps[i + 1]
+                d3 = depth_maps[i + 2]
+                # Detect back-and-forth changes
+                diff_12 = np.mean(np.abs(d2 - d1))
+                diff_23 = np.mean(np.abs(d3 - d2))
+                flickers.append((diff_12 + diff_23) / 2)
+            metrics.flicker_score = float(np.mean(flickers)) if flickers else 0.0
+
+    def _save_temporal_analysis(self, depth_maps: List[np.ndarray], output_dir: Path):
+        """Save temporal consistency analysis with visualizations."""
+        if len(depth_maps) < 2:
+            return
+
+        import matplotlib.pyplot as plt
+
+        # Calculate frame-to-frame changes
+        changes = []
+        for i in range(len(depth_maps) - 1):
+            diff = np.mean(np.abs(depth_maps[i + 1] - depth_maps[i]))
+            changes.append(diff)
+
+        # Create analysis plot
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+
+        # Plot 1: Frame-to-frame changes
+        ax1.plot(changes, 'b-', alpha=0.7, linewidth=1)
+        ax1.axhline(y=np.mean(changes), color='r', linestyle='--', label=f'Mean: {np.mean(changes):.4f}')
+        ax1.set_xlabel('Frame')
+        ax1.set_ylabel('Mean Absolute Difference')
+        ax1.set_title('Temporal Consistency: Frame-to-Frame Depth Changes')
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+
+        # Plot 2: Histogram of changes
+        ax2.hist(changes, bins=30, alpha=0.7, edgecolor='black')
+        ax2.axvline(x=np.mean(changes), color='r', linestyle='--', label=f'Mean: {np.mean(changes):.4f}')
+        ax2.axvline(x=np.median(changes), color='g', linestyle='--', label=f'Median: {np.median(changes):.4f}')
+        ax2.set_xlabel('Mean Absolute Difference')
+        ax2.set_ylabel('Frequency')
+        ax2.set_title('Distribution of Depth Changes')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3, axis='y')
+
+        plt.tight_layout()
+        output_path = output_dir / "temporal_analysis.png"
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        # Save sample frames for visual comparison
+        sample_indices = [0, len(depth_maps) // 4, len(depth_maps) // 2, 3 * len(depth_maps) // 4, -1]
+        fig, axes = plt.subplots(1, len(sample_indices), figsize=(15, 3))
+        for idx, frame_idx in enumerate(sample_indices):
+            if frame_idx >= len(depth_maps):
+                continue
+            depth = depth_maps[frame_idx]
+            depth_norm = (depth - depth.min()) / (depth.max() - depth.min() + 1e-6)
+            axes[idx].imshow(depth_norm, cmap='turbo')
+            axes[idx].set_title(f'Frame {frame_idx if frame_idx >= 0 else len(depth_maps) + frame_idx}')
+            axes[idx].axis('off')
+
+        plt.tight_layout()
+        sample_path = output_dir / "temporal_samples.png"
+        plt.savefig(sample_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        print(f"📊 Saved temporal analysis to {output_path}")
+        print(f"📊 Saved temporal samples to {sample_path}")

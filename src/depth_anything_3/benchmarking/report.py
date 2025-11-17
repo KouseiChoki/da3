@@ -77,6 +77,7 @@ class ReportGenerator:
         # Generate HTML sections
         header = self._generate_header(benchmark_name, description)
         summary = self._generate_summary_table(results)
+        comparison = self._generate_comparison_charts(chart_data)
         charts = self._generate_charts(chart_data)
         detailed = self._generate_detailed_results(results)
 
@@ -97,6 +98,7 @@ class ReportGenerator:
     {header}
     <div class="container">
         {summary}
+        {comparison}
         {charts}
         {detailed}
     </div>
@@ -328,11 +330,36 @@ class ReportGenerator:
             "latency_p95": [r.p95_latency_ms for r in results],
             "memory_avg": [r.avg_memory_mb for r in results],
             "memory_max": [r.max_memory_mb for r in results],
+            "temporal_jitter": [r.temporal_jitter for r in results],
+            "temporal_smoothness": [r.temporal_smoothness for r in results],
+            "flicker_score": [r.flicker_score for r in results],
             "frame_data": {
                 r.scenario_name: [fm.total_time_ms for fm in r.frame_metrics]
                 for r in results
             }
         }
+
+    def _generate_comparison_charts(self, data: Dict[str, Any]) -> str:
+        """Generate comparison charts showing all results at a glance."""
+        return f"""
+        <div class="section">
+            <h2>🔍 At-a-Glance Comparison</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="comparisonFpsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonTemporalChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonStabilityChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonLatencyMemoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        """
 
     def _generate_charts(self, data: Dict[str, Any]) -> str:
         """Generate chart containers."""
@@ -365,15 +392,230 @@ class ReportGenerator:
         latency_p95_json = json.dumps(data["latency_p95"])
         memory_avg_json = json.dumps(data["memory_avg"])
         memory_max_json = json.dumps(data["memory_max"])
+        temporal_jitter_json = json.dumps(data["temporal_jitter"])
+        temporal_smoothness_json = json.dumps(data["temporal_smoothness"])
+        flicker_score_json = json.dumps(data["flicker_score"])
 
-        # Get first scenario's frame data for timeline chart
-        first_scenario = data["scenarios"][0] if data["scenarios"] else ""
-        frame_times = data["frame_data"].get(first_scenario, [])
-        frame_indices = list(range(len(frame_times)))
-        frame_times_json = json.dumps(frame_times)
+        # Prepare frame data for all scenarios
+        frame_data_dict = data["frame_data"]
+        # Find the maximum number of frames across all scenarios
+        max_frames = max(len(times) for times in frame_data_dict.values()) if frame_data_dict else 0
+        frame_indices = list(range(max_frames))
         frame_indices_json = json.dumps(frame_indices)
 
+        # Build datasets for all scenarios
+        frame_datasets = []
+        for idx, (scenario_name, frame_times) in enumerate(frame_data_dict.items()):
+            color = f"rgba({102 + idx * 30 % 153}, {126 + idx * 40 % 129}, {234 - idx * 20 % 90}, 1)"
+            frame_datasets.append({
+                "label": scenario_name,
+                "data": frame_times,
+                "borderColor": color,
+                "backgroundColor": color.replace("1)", "0.1)"),
+                "borderWidth": 2,
+                "pointRadius": 0.5,
+            })
+        frame_datasets_json = json.dumps(frame_datasets)
+
         return f"""
+        // Comparison Charts
+        new Chart(document.getElementById('comparisonFpsChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {scenarios_json},
+                datasets: [{{
+                    label: 'FPS',
+                    data: {fps_json},
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'FPS Comparison',
+                        font: {{ size: 16, weight: 'bold' }}
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        title: {{ display: true, text: 'Frames Per Second' }}
+                    }}
+                }}
+            }}
+        }});
+
+        new Chart(document.getElementById('comparisonTemporalChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {scenarios_json},
+                datasets: [
+                    {{
+                        label: 'Smoothness (higher = better)',
+                        data: {temporal_smoothness_json},
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2,
+                        yAxisID: 'y'
+                    }},
+                    {{
+                        label: 'Jitter (lower = better)',
+                        data: {temporal_jitter_json},
+                        backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 2,
+                        yAxisID: 'y1'
+                    }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {{
+                    mode: 'index',
+                    intersect: false
+                }},
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Temporal Consistency (Dual Axis)',
+                        font: {{ size: 16, weight: 'bold' }}
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {{ display: true, text: 'Smoothness' }},
+                        grid: {{ drawOnChartArea: true }}
+                    }},
+                    y1: {{
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        title: {{ display: true, text: 'Jitter' }},
+                        grid: {{ drawOnChartArea: false }}
+                    }}
+                }}
+            }}
+        }});
+
+        new Chart(document.getElementById('comparisonStabilityChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {scenarios_json},
+                datasets: [{{
+                    label: 'Flicker Score (lower = better)',
+                    data: {flicker_score_json},
+                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 2
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Stability (Flicker)',
+                        font: {{ size: 16, weight: 'bold' }}
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        title: {{ display: true, text: 'Flicker Score' }}
+                    }}
+                }}
+            }}
+        }});
+
+        // Color palette for scenarios
+        const colors = [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(220, 53, 69, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(111, 66, 193, 0.8)',
+            'rgba(23, 162, 184, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(201, 203, 207, 0.8)',
+        ];
+
+        new Chart(document.getElementById('comparisonLatencyMemoryChart'), {{
+            type: 'scatter',
+            data: {{
+                datasets: {scenarios_json}.map((name, i) => ({{
+                    label: name,
+                    data: [{{
+                        x: {latency_avg_json}[i],
+                        y: {memory_avg_json}[i]
+                    }}],
+                    backgroundColor: colors[i % colors.length],
+                    borderColor: colors[i % colors.length].replace('0.8', '1.0'),
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }}))
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Latency vs Memory',
+                        font: {{ size: 16, weight: 'bold' }}
+                    }},
+                    tooltip: {{
+                        callbacks: {{
+                            label: function(context) {{
+                                let label = context.dataset.label || '';
+                                if (label) {{
+                                    label += ': ';
+                                }}
+                                label += 'Latency: ' + context.parsed.x.toFixed(2) + 'ms, ';
+                                label += 'Memory: ' + context.parsed.y.toFixed(2) + 'MB';
+                                return label;
+                            }}
+                        }}
+                    }},
+                    legend: {{
+                        display: true,
+                        position: 'right',
+                        labels: {{
+                            boxWidth: 12,
+                            padding: 8,
+                            font: {{ size: 10 }}
+                        }}
+                    }}
+                }},
+                scales: {{
+                    x: {{
+                        title: {{ display: true, text: 'Average Latency (ms)' }},
+                        beginAtZero: true
+                    }},
+                    y: {{
+                        title: {{ display: true, text: 'Average Memory (MB)' }},
+                        beginAtZero: true
+                    }}
+                }}
+            }}
+        }});
+
         // FPS Chart
         new Chart(document.getElementById('fpsChart'), {{
             type: 'bar',
@@ -494,27 +736,33 @@ class ReportGenerator:
             }}
         }});
 
-        // Frame Time Chart (first scenario only)
+        // Frame Time Chart (all scenarios)
         new Chart(document.getElementById('frameTimeChart'), {{
             type: 'line',
             data: {{
                 labels: {frame_indices_json},
-                datasets: [{{
-                    label: '{first_scenario}',
-                    data: {frame_times_json},
-                    borderColor: 'rgba(102, 126, 234, 1)',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    borderWidth: 2,
-                    pointRadius: 1
-                }}]
+                datasets: {frame_datasets_json}
             }},
             options: {{
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {{
+                    mode: 'index',
+                    intersect: false
+                }},
                 plugins: {{
                     title: {{
                         display: true,
-                        text: 'Frame Processing Time (First Scenario)'
+                        text: 'Frame Processing Time (All Scenarios)'
+                    }},
+                    legend: {{
+                        display: true,
+                        position: 'top',
+                        labels: {{
+                            boxWidth: 12,
+                            padding: 8,
+                            font: {{ size: 10 }}
+                        }}
                     }}
                 }},
                 scales: {{
@@ -548,41 +796,59 @@ class ReportGenerator:
                     <div class="stat-value">{metric.avg_fps:.2f}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Min FPS</div>
-                    <div class="stat-value">{metric.min_fps:.2f}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Max FPS</div>
-                    <div class="stat-value">{metric.max_fps:.2f}</div>
-                </div>
-                <div class="stat-card">
                     <div class="stat-label">Avg Latency</div>
                     <div class="stat-value">{metric.avg_latency_ms:.1f}ms</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">P95 Latency</div>
-                    <div class="stat-value">{metric.p95_latency_ms:.1f}ms</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">P99 Latency</div>
-                    <div class="stat-value">{metric.p99_latency_ms:.1f}ms</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Avg Memory</div>
-                    <div class="stat-value">{metric.avg_memory_mb:.1f}MB</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Peak Memory</div>
                     <div class="stat-value">{metric.max_memory_mb:.1f}MB</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-label">Temporal Jitter</div>
+                    <div class="stat-value">{metric.temporal_jitter:.4f}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Smoothness</div>
+                    <div class="stat-value">{metric.temporal_smoothness:.3f}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flicker Score</div>
+                    <div class="stat-value">{metric.flicker_score:.4f}</div>
+                </div>
             </div>
             """
+
+            # Check if temporal analysis images exist
+            scenario_dir = self.output_dir / metric.scenario_name
+            temporal_img = scenario_dir / "temporal_analysis.png"
+            samples_img = scenario_dir / "temporal_samples.png"
+            comparison_video = scenario_dir / "comparison.mp4"
+
+            temporal_section = ""
+            if temporal_img.exists():
+                temporal_section = f"""
+                <h4>Temporal Consistency Analysis</h4>
+                <img src="{metric.scenario_name}/temporal_analysis.png" style="max-width: 100%; margin: 1rem 0;">
+                """
+            if samples_img.exists():
+                temporal_section += f"""
+                <h4>Sample Frames</h4>
+                <img src="{metric.scenario_name}/temporal_samples.png" style="max-width: 100%; margin: 1rem 0;">
+                """
+            if comparison_video.exists():
+                temporal_section += f"""
+                <h4>Comparison Video</h4>
+                <video controls style="max-width: 100%; margin: 1rem 0;">
+                    <source src="{metric.scenario_name}/comparison.mp4" type="video/mp4">
+                </video>
+                """
 
             sections.append(f"""
             <div class="scenario-details">
                 <h3>{metric.scenario_name}</h3>
-                <p><strong>Device:</strong> {metric.device} | <strong>Total Frames:</strong> {metric.total_frames} | <strong>Total Time:</strong> {metric.total_time_s:.2f}s</p>
+                <p><strong>Device:</strong> {metric.device} | <strong>Frames:</strong> {metric.total_frames} | <strong>Time:</strong> {metric.total_time_s:.2f}s</p>
                 {stats_cards}
+                {temporal_section}
             </div>
             """)
 

@@ -926,6 +926,7 @@ def stream(
     device: str = typer.Option(None, help="Device to use (auto-detects if not specified)"),
     host: str = typer.Option("0.0.0.0", help="Host to bind to"),
     port: int = typer.Option(8080, help="Port to bind to"),
+    process_res: int = typer.Option(504, help="Processing resolution (rounded to nearest multiple of 14)"),
     window_size: int = typer.Option(None, help="Default window size (frames per processing window)"),
     overlap: int = typer.Option(None, help="Default overlap between windows"),
     buffer_size: int = typer.Option(None, help="Default buffer size before processing"),
@@ -991,6 +992,7 @@ def stream(
             device=device,
             host=host,
             port=port,
+            process_res=process_res,
         )
     except KeyboardInterrupt:
         typer.echo("\n👋 Streaming server stopped.")

@@ -1,0 +1,691 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Streaming Benchmark - Benchmark Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .header .timestamp {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .metric-good {
+            color: #28a745;
+        }
+
+        .metric-warning {
+            color: #ffc107;
+        }
+
+        .metric-bad {
+            color: #dc3545;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .scenario-details {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .scenario-details h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .comparison-note {
+            background: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+    </style>
+</head>
+<body>
+    
+        <div class="header">
+            <h1>📊 Comprehensive Streaming Benchmark</h1>
+            <div class="subtitle">Full benchmark testing models across resolutions with proper divisibility</div>
+            <div class="timestamp">Generated: 2025-11-17 13:53:38</div>
+        </div>
+        
+    <div class="container">
+        
+        <div class="section">
+            <h2>📈 Performance Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Avg FPS</th>
+                        <th>Avg Latency (ms)</th>
+                        <th>P95 Latency (ms)</th>
+                        <th>Avg Memory (MB)</th>
+                        <th>Peak Memory (MB)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td><strong>DA3-SMALL_252</strong></td>
+                <td class="metric-value">45.45</td>
+                <td>20.37</td>
+                <td>82.85</td>
+                <td>130.90</td>
+                <td>130.90</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_378</strong></td>
+                <td class="metric-value">35.49</td>
+                <td>27.20</td>
+                <td>202.04</td>
+                <td>130.96</td>
+                <td>130.97</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-SMALL_504</strong></td>
+                <td class="metric-value">17.66</td>
+                <td>55.13</td>
+                <td>441.81</td>
+                <td>131.07</td>
+                <td>131.09</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-BASE_252</strong></td>
+                <td class="metric-value">40.74</td>
+                <td>23.57</td>
+                <td>177.19</td>
+                <td>516.72</td>
+                <td>516.76</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-BASE_504</strong></td>
+                <td class="metric-value">8.04</td>
+                <td>121.14</td>
+                <td>970.62</td>
+                <td>516.78</td>
+                <td>516.83</td>
+            </tr>
+            
+            <tr>
+                <td><strong>DA3-BASE_630</strong></td>
+                <td class="metric-value">2.71</td>
+                <td>358.44</td>
+                <td>2828.46</td>
+                <td>517.00</td>
+                <td>517.08</td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        
+        <div class="section">
+            <h2>📊 Performance Charts</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="fpsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="memoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="frameTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="section">
+            <h2>🔍 Detailed Results</h2>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_252</h3>
+                <p><strong>Device:</strong> mps | <strong>Total Frames:</strong> 100 | <strong>Total Time:</strong> 2.20s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">45.45</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">45.45</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">45.45</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">20.4ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">82.8ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">119.0ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">130.9MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">130.9MB</div>
+                </div>
+            </div>
+            
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_378</h3>
+                <p><strong>Device:</strong> mps | <strong>Total Frames:</strong> 100 | <strong>Total Time:</strong> 2.82s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">35.49</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">35.49</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">35.49</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">27.2ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">202.0ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">239.6ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">131.0MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.0MB</div>
+                </div>
+            </div>
+            
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-SMALL_504</h3>
+                <p><strong>Device:</strong> mps | <strong>Total Frames:</strong> 100 | <strong>Total Time:</strong> 5.66s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">17.66</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">17.66</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">17.66</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">55.1ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">441.8ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">448.9ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">131.1MB</div>
+                </div>
+            </div>
+            
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-BASE_252</h3>
+                <p><strong>Device:</strong> mps | <strong>Total Frames:</strong> 100 | <strong>Total Time:</strong> 2.45s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">40.74</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">40.74</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">40.74</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">23.6ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">177.2ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">209.5ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">516.7MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">516.8MB</div>
+                </div>
+            </div>
+            
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-BASE_504</h3>
+                <p><strong>Device:</strong> mps | <strong>Total Frames:</strong> 100 | <strong>Total Time:</strong> 12.44s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">8.04</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">8.04</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">8.04</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">121.1ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">970.6ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">994.6ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">516.8MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">516.8MB</div>
+                </div>
+            </div>
+            
+            </div>
+            
+            <div class="scenario-details">
+                <h3>DA3-BASE_630</h3>
+                <p><strong>Device:</strong> mps | <strong>Total Frames:</strong> 100 | <strong>Total Time:</strong> 36.95s</p>
+                
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">2.71</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">2.71</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">2.71</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">358.4ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">2828.5ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">4238.8ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">517.0MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">517.1MB</div>
+                </div>
+            </div>
+            
+            </div>
+            
+        </div>
+        
+    </div>
+    <script>
+        
+        // FPS Chart
+        new Chart(document.getElementById('fpsChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-BASE_252", "DA3-BASE_504", "DA3-BASE_630"],
+                datasets: [{
+                    label: 'Average FPS',
+                    data: [45.44781654455844, 35.49491636069259, 17.657608837965167, 40.741796645174674, 8.039738809850286, 2.7062598150055126],
+                    backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Average FPS Comparison'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'FPS'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Latency Chart
+        new Chart(document.getElementById('latencyChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-BASE_252", "DA3-BASE_504", "DA3-BASE_630"],
+                datasets: [
+                    {
+                        label: 'Avg Latency',
+                        data: [20.369067192077637, 27.204453945159912, 55.130226612091064, 23.569719791412354, 121.13650560379028, 358.4423899650574],
+                        backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'P95 Latency',
+                        data: [82.84741640090942, 202.04025506973267, 441.8115973472595, 177.19295024871826, 970.6150054931641, 2828.4638285636897],
+                        backgroundColor: 'rgba(255, 193, 7, 0.5)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Latency Comparison (ms)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Milliseconds'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Memory Chart
+        new Chart(document.getElementById('memoryChart'), {
+            type: 'bar',
+            data: {
+                labels: ["DA3-SMALL_252", "DA3-SMALL_378", "DA3-SMALL_504", "DA3-BASE_252", "DA3-BASE_504", "DA3-BASE_630"],
+                datasets: [
+                    {
+                        label: 'Avg Memory',
+                        data: [130.896708984375, 130.95559326171875, 131.0674951171875, 516.7156079101562, 516.7825317382812, 517.0035107421875],
+                        backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Peak Memory',
+                        data: [130.90283203125, 130.968994140625, 131.0947265625, 516.75634765625, 516.83154296875, 517.079833984375],
+                        backgroundColor: 'rgba(111, 66, 193, 0.5)',
+                        borderColor: 'rgba(111, 66, 193, 1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Memory Usage (MB)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Megabytes'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Frame Time Chart (first scenario only)
+        new Chart(document.getElementById('frameTimeChart'), {
+            type: 'line',
+            data: {
+                labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
+                datasets: [{
+                    label: 'DA3-SMALL_252',
+                    data: [0.025033950805664062, 0.0011920928955078125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0019073486328125, 0.00095367431640625, 0.0, 0.0, 1094.70796585083, 0.0030994415283203125, 0.0, 0.0011920928955078125, 0.0, 0.0, 0.0007152557373046875, 0.0011920928955078125, 109.09581184387207, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.0, 0.0011920928955078125, 89.9960994720459, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0007152557373046875, 0.0, 0.0, 82.49711990356445, 0.00095367431640625, 0.0, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.0, 0.0007152557373046875, 84.17201042175293, 0.00095367431640625, 0.0011920928955078125, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 81.76994323730469, 0.0007152557373046875, 0.0011920928955078125, 0.0, 0.0011920928955078125, 0.00095367431640625, 0.0, 0.0, 83.9991569519043, 0.00095367431640625, 0.0, 0.0, 0.0, 0.0007152557373046875, 0.0, 0.0, 81.88390731811523, 0.00095367431640625, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 81.87484741210938, 0.00095367431640625, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 82.03268051147461, 0.0011920928955078125, 0.0011920928955078125, 0.0, 0.0, 0.0007152557373046875, 0.0, 0.00095367431640625, 82.02385902404785, 0.0, 0.0, 0.00095367431640625, 0.0, 0.00095367431640625, 0.0, 0.0, 82.78679847717285],
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Frame Processing Time (First Scenario)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Time (ms)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Frame Index'
+                        }
+                    }
+                }
+            }
+        });
+        
+    </script>
+</body>
+</html>

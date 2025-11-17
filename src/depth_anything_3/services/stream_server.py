@@ -69,12 +69,13 @@ app.add_middleware(
 )
 
 
-def init_model(model_dir: str, device: str):
+def init_model(model_dir: str, device: str, process_res: int = 504):
     """Initialize the model."""
     global model, stream_estimator
     print(f"📦 Loading model from {model_dir} on {device}...")
+    print(f"⚙️  Process resolution: {process_res}")
     model = DepthAnything3.from_pretrained(model_dir).to(device)
-    stream_estimator = StreamingDepthEstimator(model, device=device)
+    stream_estimator = StreamingDepthEstimator(model, device=device, process_res=process_res)
     print(f"✅ Model loaded and ready for streaming")
 
 
@@ -427,6 +428,7 @@ def start_stream_server(
     device: str = "mps",
     host: str = "0.0.0.0",
     port: int = 8080,
+    process_res: int = 504,
 ):
     """
     Start the streaming server.
@@ -436,11 +438,12 @@ def start_stream_server(
         device: Device to use (mps, cuda, cpu)
         host: Host to bind to
         port: Port to bind to
+        process_res: Processing resolution (will be rounded to nearest multiple of 14)
     """
     import uvicorn
 
     # Initialize model
-    init_model(model_dir, device)
+    init_model(model_dir, device, process_res)
 
     print(f"")
     print(f"🌐 Starting server on http://{host}:{port}")

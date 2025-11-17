@@ -67,9 +67,10 @@ class BenchmarkMetrics:
     max_memory_mb: float = 0.0
     peak_allocated_mb: float = 0.0
 
-    # Quality metrics (optional - requires ground truth)
-    avg_depth_range: float = 0.0
-    depth_consistency: float = 0.0  # Frame-to-frame consistency
+    # Temporal consistency metrics
+    temporal_jitter: float = 0.0  # Std dev of frame-to-frame depth changes
+    temporal_smoothness: float = 0.0  # 1 - (avg abs diff between consecutive frames)
+    flicker_score: float = 0.0  # High frequency changes (bad = high)
 
     # Pose estimation metrics
     pose_estimation_enabled: bool = False

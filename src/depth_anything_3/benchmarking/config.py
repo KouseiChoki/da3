@@ -88,6 +88,7 @@ class BenchmarkScenario:
     # Test configuration
     num_frames: int = 100  # Number of frames to process
     warmup_frames: int = 10  # Warmup frames to skip
+    sample_every_n_frames: int = 1  # Process every Nth frame (1 = all, 2 = every other, etc.)
 
     # Pose estimation configuration
     test_pose_estimation: bool = False  # Test camera pose estimation
@@ -188,17 +189,22 @@ class BenchmarkConfig:
             stream_config = StreamConfig(**stream_data)
 
             # Create scenario
+            resolution = tuple(scenario_data.get("resolution", [640, 480]))
+            # Default process_res to max dimension of resolution (proper scaling)
+            default_process_res = max(resolution)
+
             scenario = BenchmarkScenario(
                 name=scenario_data["name"],
                 model=model,
                 num_cameras=scenario_data.get("num_cameras", 1),
-                resolution=tuple(scenario_data.get("resolution", [640, 480])),
+                resolution=resolution,
                 precision=scenario_data.get("precision", "fp32"),
                 device=scenario_data.get("device", "mps"),
-                process_res=scenario_data.get("process_res", 504),
+                process_res=scenario_data.get("process_res", default_process_res),
                 stream_config=stream_config,
                 num_frames=scenario_data.get("num_frames", 100),
                 warmup_frames=scenario_data.get("warmup_frames", 10),
+                sample_every_n_frames=scenario_data.get("sample_every_n_frames", 1),
                 test_pose_estimation=scenario_data.get("test_pose_estimation", False),
                 test_pose_conditioned=scenario_data.get("test_pose_conditioned", False),
                 align_to_input_ext_scale=scenario_data.get("align_to_input_ext_scale", False),

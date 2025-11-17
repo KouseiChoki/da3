@@ -100,10 +100,12 @@ class StreamingDepthEstimator:
         model: DepthAnything3,
         device: str = "mps",
         config: Optional[StreamConfig] = None,
+        process_res: int = 504,
     ):
         self.model = model
         self.device = device
         self.config = config or StreamConfig.for_device(device)
+        self.process_res = process_res
 
         # Sliding window state
         self.frame_buffer = deque(maxlen=self.config.buffer_size + self.config.overlap)
@@ -155,7 +157,7 @@ class StreamingDepthEstimator:
         prediction = self.model.inference(
             image=frames,
             export_dir=None,  # No export, just get results
-            process_res=504,
+            process_res=self.process_res,
             process_res_method="upper_bound_resize",
         )
 
