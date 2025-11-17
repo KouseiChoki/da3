@@ -270,6 +270,9 @@ async def websocket_endpoint(
             # Receive image data
             print(f"\n🔄 Waiting for frame #{frame_count + 1}...")
 
+            # Initialize seq_id for this frame
+            seq_id = None
+
             try:
                 # Try to receive any message (text or binary)
                 message = await websocket.receive()
@@ -285,11 +288,13 @@ async def websocket_endpoint(
                         try:
                             metadata = json.loads(text)
                             if metadata.get('format') == 'numpy':
+                                # Extract seq_id for frame synchronization
+                                seq_id = metadata.get('seq_id', None)
                                 # Expect binary data next
                                 bin_msg = await websocket.receive()
                                 if 'bytes' in bin_msg:
                                     data = bin_msg['bytes']
-                                    print(f"Received numpy: {len(data)} bytes")
+                                    print(f"Received numpy: {len(data)} bytes [seq={seq_id}]")
                                 else:
                                     print("Expected binary after numpy metadata")
                                     continue
@@ -395,9 +400,9 @@ async def websocket_endpoint(
                 depth_min = float(depth.min())
                 depth_max = float(depth.max())
 
-            print(f"Sending depth map ({len(depth_b64)} chars base64, format={data_format})")
+            print(f"Sending depth map ({len(depth_b64)} chars base64, format={data_format}, seq={seq_id})")
 
-            # Send response
+            # Send response with seq_id for frame synchronization
             await websocket.send_json({
                 "status": "success",
                 "shape": list(depth.shape),
@@ -406,10 +411,11 @@ async def websocket_endpoint(
                 "data": depth_b64,
                 "min": depth_min,
                 "max": depth_max,
+                "seq_id": seq_id,  # Echo back sequence ID for client-side sync
                 "stats": per_conn_estimator.get_stats(),
             })
 
-            print(f"✅ Frame #{frame_count} complete!")
+            print(f"✅ Frame #{frame_count} complete [seq={seq_id}]!")
 
     except WebSocketDisconnect:
         print(f"\n👋 WebSocket client disconnected (processed {frame_count} frames)")
