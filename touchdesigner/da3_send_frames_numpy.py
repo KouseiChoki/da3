@@ -78,23 +78,32 @@ def send_frame():
                 frame_array = source_top.numpyArray(delayed=False)
                 # TouchDesigner returns (height, width, channels) in float32 [0, 1]
 
+                # Store frame for synchronization
+                sync_dat = comp.op('da3_frame_sync')
+                if sync_dat:
+                    sync_mgr = sync_dat.module.get_sync_manager(comp)
+                    seq_id = sync_mgr.store_sent_frame(frame_array)
+                else:
+                    seq_id = comp.fetch('frame_counter', 0)
+
                 # Convert to uint8 [0, 255]
                 frame_uint8 = (frame_array * 255).astype(np.uint8)
 
                 h, w, c = frame_uint8.shape
 
-                # Send JSON metadata first
+                # Send JSON metadata first with sequence ID
                 metadata = {
                     "format": "numpy",
                     "shape": [h, w, c],
-                    "dtype": "uint8"
+                    "dtype": "uint8",
+                    "seq_id": seq_id
                 }
                 websocket_dat.sendText(json.dumps(metadata))
 
                 # Then send binary data
                 websocket_dat.sendBinary(frame_uint8.tobytes())
 
-                debug(f"Sent numpy frame: {h}x{w}x{c}")
+                debug(f"Sent numpy frame: {h}x{w}x{c} [seq={seq_id}]")
 
             except AttributeError:
                 # numpyArray() not available, fall back to JPEG

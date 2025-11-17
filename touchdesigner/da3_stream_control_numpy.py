@@ -237,30 +237,48 @@ def onReceiveText(dat, rowIndex, message):
             shape = tuple(data['shape'])
             depth_min = data.get('min', 0.0)
             depth_max = data.get('max', 1.0)
+            seq_id = data.get('seq_id', None)
 
             # Decode based on format
             if data_format == 'raw_float32':
                 # Raw float32 numpy array
                 depth_bytes = base64.b64decode(depth_b64)
                 depth = np.frombuffer(depth_bytes, dtype=np.float32).reshape(shape)
-                debug(f"Received raw float32 depth: {shape}, range={depth_min:.3f}-{depth_max:.3f}")
+                debug(f"Received raw float32 depth: {shape}, range={depth_min:.3f}-{depth_max:.3f}, seq={seq_id}")
             else:
                 # JPEG uint8 - need to denormalize
                 depth_bytes = base64.b64decode(depth_b64)
                 depth_uint8 = np.frombuffer(depth_bytes, dtype=np.uint8).reshape(shape)
                 # Denormalize from 0-255 back to original range
                 depth = (depth_uint8.astype(np.float32) / 255.0) * (depth_max - depth_min) + depth_min
-                debug(f"Received JPEG depth: {shape}, denormalized to range={depth.min():.3f}-{depth.max():.3f}")
+                debug(f"Received JPEG depth: {shape}, denormalized to range={depth.min():.3f}-{depth.max():.3f}, seq={seq_id}")
 
             # Store depth array in comp storage
             comp.store('depth_array', depth)
             comp.store('depth_min', depth_min)
             comp.store('depth_max', depth_max)
 
+            # Retrieve matching RGB frame for synchronization
+            if seq_id is not None:
+                sync_dat = comp.op('da3_frame_sync')
+                if sync_dat:
+                    sync_mgr = sync_dat.module.get_sync_manager(comp)
+                    synced_rgb = sync_mgr.get_frame_for_depth(seq_id)
+                    if synced_rgb is not None:
+                        comp.store('synced_rgb_frame', synced_rgb)
+                        debug(f"Retrieved synced RGB frame for seq={seq_id}")
+                    else:
+                        debug(f"WARNING: No RGB frame found for seq={seq_id} (aged out?)")
+
             # Trigger depth display Script TOP to cook
             depth_display = comp.op('depth_display')
             if depth_display:
                 depth_display.cook(force=True)
+
+            # Trigger synced RGB output Script TOP to cook
+            synced_output = comp.op('out_synched')
+            if synced_output:
+                synced_output.cook(force=True)
 
             # Update status with stats
             stats = data.get('stats', {})

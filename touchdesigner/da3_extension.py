@@ -73,6 +73,14 @@ class DepthAnything3Ext:
         p[0].default = True
         p[0].val = True
 
+        p = page.appendInt('Syncbuffersize', label='Sync Buffer Size')
+        p[0].default = 30
+        p[0].min = 10
+        p[0].max = 120
+        p[0].clampMin = True
+        p[0].clampMax = True
+        p[0].val = 30
+
         # Backend section
         p = page.appendStr('Backendpath', label='Backend Path')
         p[0].default = '/Users/flo/work/code/Depth-Anything-3'
@@ -296,9 +304,9 @@ class DepthAnything3Ext:
         Get process resolution width respecting input aspect ratio.
         Call from expression: parent().ext.DepthAnything3Ext.GetProcessResWidth()
         """
-        process_res_idx = self.ownerComp.par.Processres.eval()
-        process_res_values = [252, 378, 504, 756, 1008]
-        process_res = process_res_values[process_res_idx] if 0 <= process_res_idx < len(process_res_values) else 252
+        # Get menu name (string like '252', '378', etc.) and convert to int
+        process_res_str = self.ownerComp.par.Processres.eval()
+        process_res = int(process_res_str)
 
         # Get input aspect ratio from in_video
         in_video = self.ownerComp.op('in_video')
@@ -319,9 +327,9 @@ class DepthAnything3Ext:
         Get process resolution height respecting input aspect ratio.
         Call from expression: parent().ext.DepthAnything3Ext.GetProcessResHeight()
         """
-        process_res_idx = self.ownerComp.par.Processres.eval()
-        process_res_values = [252, 378, 504, 756, 1008]
-        process_res = process_res_values[process_res_idx] if 0 <= process_res_idx < len(process_res_values) else 252
+        # Get menu name (string like '252', '378', etc.) and convert to int
+        process_res_str = self.ownerComp.par.Processres.eval()
+        process_res = int(process_res_str)
 
         # Get input aspect ratio from in_video
         in_video = self.ownerComp.op('in_video')
