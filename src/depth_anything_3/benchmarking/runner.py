@@ -259,6 +259,7 @@ class BenchmarkRunner:
                     device=scenario.device,
                     config=stream_config,
                     process_res=scenario.process_res,
+                    collect_timing=True,  # Always collect timing in benchmarks
                 )
 
                 # Warmup
@@ -296,6 +297,10 @@ class BenchmarkRunner:
 
                 # Finalize metrics
                 metrics = collector.finalize(total_time)
+
+                # Transfer timing stats from estimator to metrics
+                if estimator.timing_stats is not None:
+                    metrics.timing_stats = estimator.timing_stats
 
                 del estimator
 

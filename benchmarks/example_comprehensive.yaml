@@ -231,7 +231,7 @@ scenarios:
     save_depth_maps: true
     save_comparison_video: true
 
-  - name: "DA3-SMALL_504_win32"
+  - name: "DA3-SMALL_504_win24"
     model:
       name: "DA3-SMALL"
       model_dir: "depth-anything/DA3-SMALL"

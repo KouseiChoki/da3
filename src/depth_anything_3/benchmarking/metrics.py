@@ -25,6 +25,8 @@ import numpy as np
 import psutil
 import torch
 
+from ..utils.timing import TimingBreakdown, AggregatedTimingStats
+
 
 @dataclass
 class FrameMetrics:
@@ -35,6 +37,7 @@ class FrameMetrics:
     total_time_ms: float  # Total time including pre/post processing
     memory_used_mb: float  # GPU/MPS memory used
     memory_allocated_mb: float  # GPU/MPS memory allocated
+    timing_breakdown: Optional[TimingBreakdown] = None  # Detailed timing breakdown
 
 
 @dataclass
@@ -81,10 +84,19 @@ class BenchmarkMetrics:
     cpu_percent: float = 0.0
     ram_used_gb: float = 0.0
 
+    # Detailed timing breakdown (aggregated)
+    timing_stats: Optional[AggregatedTimingStats] = None
+
     def add_frame(self, frame_metric: FrameMetrics):
         """Add a frame metric."""
         self.frame_metrics.append(frame_metric)
         self.total_frames += 1
+
+        # Collect timing breakdown if available
+        if frame_metric.timing_breakdown is not None:
+            if self.timing_stats is None:
+                self.timing_stats = AggregatedTimingStats()
+            self.timing_stats.add_breakdown(frame_metric.timing_breakdown)
 
     def compute_statistics(self):
         """Compute aggregate statistics from frame metrics."""
@@ -127,7 +139,7 @@ class BenchmarkMetrics:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dict for serialization."""
-        return {
+        result = {
             "scenario_name": self.scenario_name,
             "device": self.device,
             "summary": {
@@ -163,6 +175,12 @@ class BenchmarkMetrics:
                 for fm in self.frame_metrics
             ],
         }
+
+        # Add timing breakdown if available
+        if self.timing_stats is not None:
+            result["timing_breakdown"] = self.timing_stats.to_dict()
+
+        return result
 
     def __str__(self) -> str:
         """Human-readable summary."""

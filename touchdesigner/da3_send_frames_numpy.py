@@ -2,12 +2,12 @@
 Frame Sender for DA3 Streaming (chopexecDAT) - Numpy Version
 
 Sends frames as raw numpy arrays instead of JPEG for better performance.
+Reads ALL parameters from parent COMP.
 
 Usage:
-1. Create a chopexecDAT
-2. Paste this code
-3. Set the parameters below to match your setup
-4. Connect to the CHOP you want to trigger frame sends (e.g., a Timer CHOP)
+1. Create a COMP container with parameters set up
+2. Add this as chopexecDAT inside the COMP
+3. Connect to a CHOP trigger (e.g., Timer CHOP)
 """
 
 
@@ -33,17 +33,27 @@ def send_frame():
     """
     Capture frame from TOP and send to WebSocket as raw numpy array.
     """
-    # Configuration
-    control_script = op('da3_stream_control')
-    websocket_dat = op('websocket1')  # Adjust name if needed
-    source_top = op('in_video')  # Video input TOP
+    # Get parent COMP
+    comp = parent()
 
-    # Get frame skip setting
-    frame_skip = control_script.par.Frameskip.eval()
+    # Get operators
+    websocket_dat = comp.op('websocket1')
+    source_top = comp.op('in_video')
+
+    if not websocket_dat:
+        debug("ERROR: No WebSocket DAT named 'websocket1' found!")
+        return
+
+    if not source_top:
+        debug("ERROR: No video input TOP named 'in_video' found!")
+        return
+
+    # Get frame skip setting from parent
+    frame_skip = comp.par.Frameskip.eval()
 
     # Check if we should skip this frame
-    frame_counter = parent().fetch('frame_counter', 0)
-    parent().store('frame_counter', frame_counter + 1)
+    frame_counter = comp.fetch('frame_counter', 0)
+    comp.store('frame_counter', frame_counter + 1)
 
     if frame_counter % frame_skip != 0:
         return  # Skip this frame
@@ -54,7 +64,7 @@ def send_frame():
         return
 
     # Check if we should send as numpy or JPEG
-    use_numpy = control_script.par.Usenumpy.eval()
+    use_numpy = comp.par.Usenumpy.eval()
 
     try:
         if use_numpy:
@@ -63,7 +73,6 @@ def send_frame():
             import json
 
             # Get numpy array from TOP
-            # Method 1: Use numpyArray() if available
             try:
                 frame_array = source_top.numpyArray(delayed=False)
                 # TouchDesigner returns (height, width, channels) in float32 [0, 1]
@@ -88,15 +97,19 @@ def send_frame():
             except AttributeError:
                 # numpyArray() not available, fall back to JPEG
                 debug("WARNING: numpyArray() not available, falling back to JPEG")
-                send_frame_jpeg(source_top, websocket_dat, control_script)
+                send_frame_jpeg(source_top, websocket_dat, comp)
 
         else:
             # Send as JPEG (smaller, but lossy)
-            send_frame_jpeg(source_top, websocket_dat, control_script)
+            send_frame_jpeg(source_top, websocket_dat, comp)
 
-        # Update stats
-        sent_count = parent().fetch('frames_sent', 0)
-        parent().store('frames_sent', sent_count + 1)
+        # Update stats on parent
+        comp.par.Framessent = comp.par.Framessent.eval() + 1
+
+        # Trigger next frame load
+        trigger_op = comp.op('trigger1')
+        if trigger_op:
+            trigger_op.par.triggerpulse.pulse()
 
     except Exception as e:
         debug(f"ERROR: Error sending frame: {e}")
@@ -104,13 +117,13 @@ def send_frame():
         traceback.print_exc()
 
 
-def send_frame_jpeg(source_top, websocket_dat, control_script):
+def send_frame_jpeg(source_top, websocket_dat, comp):
     """
     Send frame as JPEG (fallback method).
     """
-    # Get JPEG quality from control script (or use default 85)
+    # Get JPEG quality from parent (or use default 85)
     try:
-        quality = control_script.par.Quality.eval()
+        quality = comp.par.Quality.eval()
         if quality == 100:
             quality = 85  # JPEG doesn't support 100 well
         quality_float = quality / 100.0  # Convert to 0.0-1.0

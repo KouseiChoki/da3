@@ -78,6 +78,7 @@ class ReportGenerator:
         header = self._generate_header(benchmark_name, description)
         summary = self._generate_summary_table(results)
         comparison = self._generate_comparison_charts(chart_data)
+        timing_breakdown = self._generate_timing_breakdown_section(chart_data)
         charts = self._generate_charts(chart_data)
         detailed = self._generate_detailed_results(results)
 
@@ -99,6 +100,7 @@ class ReportGenerator:
     <div class="container">
         {summary}
         {comparison}
+        {timing_breakdown}
         {charts}
         {detailed}
     </div>
@@ -323,6 +325,12 @@ class ReportGenerator:
         """Prepare data for charts."""
         scenario_names = [r.scenario_name for r in results]
 
+        # Prepare timing breakdown data
+        timing_data = {}
+        for r in results:
+            if r.timing_stats and r.timing_stats.mean_breakdown:
+                timing_data[r.scenario_name] = r.timing_stats.mean_breakdown
+
         return {
             "scenarios": scenario_names,
             "fps": [r.avg_fps for r in results],
@@ -336,8 +344,34 @@ class ReportGenerator:
             "frame_data": {
                 r.scenario_name: [fm.total_time_ms for fm in r.frame_metrics]
                 for r in results
-            }
+            },
+            "timing_breakdown": timing_data,
         }
+
+    def _generate_timing_breakdown_section(self, data: Dict[str, Any]) -> str:
+        """Generate detailed timing breakdown section."""
+        timing_data = data.get("timing_breakdown", {})
+
+        if not timing_data:
+            return ""  # No timing data available
+
+        return f"""
+        <div class="section">
+            <h2>⏱️ Detailed Timing Breakdown</h2>
+            <div class="comparison-note">
+                <strong>Note:</strong> This section shows where processing time is spent across different pipeline stages.
+                Use this to identify bottlenecks and optimization opportunities.
+            </div>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="timingStackedChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="timingPercentageChart"></canvas>
+                </div>
+            </div>
+        </div>
+        """
 
     def _generate_comparison_charts(self, data: Dict[str, Any]) -> str:
         """Generate comparison charts showing all results at a glance."""
@@ -417,7 +451,203 @@ class ReportGenerator:
             })
         frame_datasets_json = json.dumps(frame_datasets)
 
+        # Prepare timing breakdown data
+        timing_breakdown = data.get("timing_breakdown", {})
+        has_timing = len(timing_breakdown) > 0
+
+        timing_scripts = ""
+        if has_timing:
+            timing_scenarios = list(timing_breakdown.keys())
+            timing_preprocessing = []
+            timing_input_prep = []
+            timing_model_forward = []
+            timing_postprocessing = []
+            timing_export = []
+
+            for scenario in timing_scenarios:
+                breakdown = timing_breakdown[scenario]
+                timing_preprocessing.append(breakdown.total_preprocessing_ms)
+                timing_input_prep.append(breakdown.total_input_prep_ms)
+                timing_model_forward.append(breakdown.model_forward_ms)
+                timing_postprocessing.append(breakdown.total_postprocessing_ms)
+                timing_export.append(breakdown.export_ms)
+
+            timing_scenarios_json = json.dumps(timing_scenarios)
+            timing_preprocessing_json = json.dumps(timing_preprocessing)
+            timing_input_prep_json = json.dumps(timing_input_prep)
+            timing_model_forward_json = json.dumps(timing_model_forward)
+            timing_postprocessing_json = json.dumps(timing_postprocessing)
+            timing_export_json = json.dumps(timing_export)
+
+            # Calculate percentages
+            totals = [
+                timing_preprocessing[i] + timing_input_prep[i] + timing_model_forward[i] +
+                timing_postprocessing[i] + timing_export[i]
+                for i in range(len(timing_scenarios))
+            ]
+
+            timing_preprocessing_pct = [(p / t * 100) if t > 0 else 0 for p, t in zip(timing_preprocessing, totals)]
+            timing_input_prep_pct = [(p / t * 100) if t > 0 else 0 for p, t in zip(timing_input_prep, totals)]
+            timing_model_forward_pct = [(p / t * 100) if t > 0 else 0 for p, t in zip(timing_model_forward, totals)]
+            timing_postprocessing_pct = [(p / t * 100) if t > 0 else 0 for p, t in zip(timing_postprocessing, totals)]
+            timing_export_pct = [(p / t * 100) if t > 0 else 0 for p, t in zip(timing_export, totals)]
+
+            timing_preprocessing_pct_json = json.dumps(timing_preprocessing_pct)
+            timing_input_prep_pct_json = json.dumps(timing_input_prep_pct)
+            timing_model_forward_pct_json = json.dumps(timing_model_forward_pct)
+            timing_postprocessing_pct_json = json.dumps(timing_postprocessing_pct)
+            timing_export_pct_json = json.dumps(timing_export_pct)
+
+            timing_scripts = f"""
+        // Timing Breakdown Charts
+        new Chart(document.getElementById('timingStackedChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {timing_scenarios_json},
+                datasets: [
+                    {{
+                        label: 'Preprocessing',
+                        data: {timing_preprocessing_json},
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Input Preparation',
+                        data: {timing_input_prep_json},
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Model Forward',
+                        data: {timing_model_forward_json},
+                        backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Postprocessing',
+                        data: {timing_postprocessing_json},
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Export',
+                        data: {timing_export_json},
+                        backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Time Breakdown by Stage (Absolute)',
+                        font: {{ size: 16, weight: 'bold' }}
+                    }},
+                    tooltip: {{
+                        callbacks: {{
+                            footer: function(tooltipItems) {{
+                                let sum = 0;
+                                tooltipItems.forEach(function(tooltipItem) {{
+                                    sum += tooltipItem.parsed.y;
+                                }});
+                                return 'Total: ' + sum.toFixed(2) + 'ms';
+                            }}
+                        }}
+                    }}
+                }},
+                scales: {{
+                    x: {{
+                        stacked: true,
+                        title: {{ display: true, text: 'Scenario' }}
+                    }},
+                    y: {{
+                        stacked: true,
+                        title: {{ display: true, text: 'Time (ms)' }},
+                        beginAtZero: true
+                    }}
+                }}
+            }}
+        }});
+
+        new Chart(document.getElementById('timingPercentageChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {timing_scenarios_json},
+                datasets: [
+                    {{
+                        label: 'Preprocessing',
+                        data: {timing_preprocessing_pct_json},
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Input Preparation',
+                        data: {timing_input_prep_pct_json},
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Model Forward',
+                        data: {timing_model_forward_pct_json},
+                        backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Postprocessing',
+                        data: {timing_postprocessing_pct_json},
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }},
+                    {{
+                        label: 'Export',
+                        data: {timing_export_pct_json},
+                        backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Time Breakdown by Stage (Percentage)',
+                        font: {{ size: 16, weight: 'bold' }}
+                    }}
+                }},
+                scales: {{
+                    x: {{
+                        stacked: true,
+                        title: {{ display: true, text: 'Scenario' }}
+                    }},
+                    y: {{
+                        stacked: true,
+                        title: {{ display: true, text: 'Percentage (%)' }},
+                        beginAtZero: true,
+                        max: 100
+                    }}
+                }}
+            }}
+        }});
+            """
+
         return f"""
+        {timing_scripts}
+
         // Comparison Charts
         new Chart(document.getElementById('comparisonFpsChart'), {{
             type: 'bar',

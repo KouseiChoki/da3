@@ -28,6 +28,7 @@ import time
 from ..api import DepthAnything3
 from ..utils.sliding_window import WindowConfig
 from ..specs import Prediction
+from ..utils.timing import TimingBreakdown, AggregatedTimingStats
 
 
 @dataclass
@@ -101,11 +102,13 @@ class StreamingDepthEstimator:
         device: str = "mps",
         config: Optional[StreamConfig] = None,
         process_res: int = 504,
+        collect_timing: bool = False,
     ):
         self.model = model
         self.device = device
         self.config = config or StreamConfig.for_device(device)
         self.process_res = process_res
+        self.collect_timing = collect_timing
 
         # Sliding window state
         self.frame_buffer = deque(maxlen=self.config.buffer_size + self.config.overlap)
@@ -116,6 +119,9 @@ class StreamingDepthEstimator:
         # Performance tracking
         self.last_process_time = 0.0
         self.avg_fps = 0.0
+
+        # Timing tracking
+        self.timing_stats = AggregatedTimingStats() if collect_timing else None
 
     def process_frame(
         self,
@@ -159,6 +165,7 @@ class StreamingDepthEstimator:
             export_dir=None,  # No export, just get results
             process_res=self.process_res,
             process_res_method="upper_bound_resize",
+            collect_timing=self.collect_timing,
         )
 
         # Extract depth maps
@@ -182,6 +189,10 @@ class StreamingDepthEstimator:
         window_fps = len(frames) / process_time if process_time > 0 else 0
         self.avg_fps = (self.avg_fps * 0.9 + window_fps * 0.1) if self.avg_fps > 0 else window_fps
 
+        # Track timing if enabled
+        if self.collect_timing and hasattr(prediction, 'timing'):
+            self.timing_stats.add_breakdown(prediction.timing)
+
     def flush(self) -> Iterator[np.ndarray]:
         """
         Flush remaining frames in buffer.
@@ -199,7 +210,7 @@ class StreamingDepthEstimator:
 
     def get_stats(self) -> dict:
         """Get streaming statistics."""
-        return {
+        stats = {
             "frames_received": self.frame_count,
             "frames_processed": self.processed_count * self.config.buffer_size,
             "frames_in_buffer": len(self.frame_buffer),
@@ -208,6 +219,12 @@ class StreamingDepthEstimator:
             "avg_fps": self.avg_fps,
             "latency_frames": self.config.output_latency_frames,
         }
+
+        # Add timing stats if available
+        if self.timing_stats is not None:
+            stats["timing"] = self.timing_stats.to_dict()
+
+        return stats
 
     def reset(self):
         """Reset streaming state."""

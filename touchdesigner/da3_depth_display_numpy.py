@@ -2,66 +2,16 @@
 Depth Map Display Script TOP (Numpy Version)
 
 Displays depth maps received as numpy arrays from parent storage.
+Reads ALL parameters from parent COMP.
 No PIL required - uses only TouchDesigner built-in numpy support.
 
 Usage:
-1. Create a Script TOP named 'depth_display'
+1. Create a Script TOP named 'depth_display' inside parent COMP
 2. Paste this code
-3. The script will automatically fetch depth data from parent storage
+3. The script will automatically fetch depth data and settings from parent
 """
 
 import numpy as np
-
-
-def onSetupParameters(scriptOp):
-    """Setup custom parameters."""
-    page = scriptOp.appendCustomPage('Depth Display')
-
-    # Toggle parameters
-    p = page.appendToggle('Normalize', label='Auto Normalize')
-    p[0].default = True
-
-    p = page.appendToggle('Colorize', label='Colorize Depth')
-    p[0].default = True
-
-    # Menu parameter
-    page.appendMenu('Colormap', label='Color Map')[0].menuNames = [
-        'viridis',
-        'plasma',
-        'inferno',
-        'magma',
-        'turbo',
-        'gray'
-    ]
-    scriptOp.par.Colormap.menuLabels = [
-        'Viridis (Blue-Green-Yellow)',
-        'Plasma (Purple-Pink-Yellow)',
-        'Inferno (Black-Red-Yellow)',
-        'Magma (Black-Purple-White)',
-        'Turbo (Rainbow)',
-        'Grayscale'
-    ]
-
-    p = page.appendToggle('Invert', label='Invert Depth')
-    p[0].default = False
-
-    p = page.appendFloat('Brightness', label='Brightness')
-    p[0].default = 1.0
-    p[0].normMin = 0.0
-    p[0].normMax = 3.0
-    p[0].clampMin = True
-    p[0].clampMax = True
-    p[0].min = 0.0
-    p[0].max = 3.0
-
-    p = page.appendFloat('Contrast', label='Contrast')
-    p[0].default = 1.0
-    p[0].normMin = 0.0
-    p[0].normMax = 3.0
-    p[0].clampMin = True
-    p[0].clampMax = True
-    p[0].min = 0.0
-    p[0].max = 3.0
 
 
 def onCook(scriptOp):
@@ -69,8 +19,11 @@ def onCook(scriptOp):
     Called when the Script TOP needs to update.
     Fetches depth array from storage and renders it.
     """
+    # Get parent COMP
+    comp = scriptOp.parent()
+
     # Get the latest depth array from parent storage
-    depth_array = parent().fetch('depth_array', None)
+    depth_array = comp.fetch('depth_array', None)
 
     if depth_array is None:
         # No data yet, create black image
@@ -86,8 +39,8 @@ def onCook(scriptOp):
         if len(depth.shape) == 3:
             depth = depth[:, :, 0]
 
-        # Normalize if requested
-        if scriptOp.par.Normalize.eval():
+        # Normalize if requested (read from parent parameter)
+        if comp.par.Normalize.eval():
             depth_min = depth.min()
             depth_max = depth.max()
             if depth_max > depth_min:
@@ -96,27 +49,28 @@ def onCook(scriptOp):
                 depth = np.zeros_like(depth)
         else:
             # Use stored min/max for consistent normalization
-            depth_min = parent().fetch('depth_min', depth.min())
-            depth_max = parent().fetch('depth_max', depth.max())
+            depth_min = comp.fetch('depth_min', depth.min())
+            depth_max = comp.fetch('depth_max', depth.max())
             if depth_max > depth_min:
                 depth = (depth - depth_min) / (depth_max - depth_min)
             else:
                 depth = np.zeros_like(depth)
 
-        # Apply invert
-        if scriptOp.par.Invert.eval():
+        # Apply invert (read from parent parameter)
+        if comp.par.Invert.eval():
             depth = 1.0 - depth
 
-        # Apply brightness and contrast
-        brightness = scriptOp.par.Brightness.eval()
-        contrast = scriptOp.par.Contrast.eval()
+        # Apply brightness and contrast (read from parent parameters)
+        brightness = comp.par.Brightness.eval()
+        contrast = comp.par.Contrast.eval()
         depth = (depth - 0.5) * contrast + 0.5
         depth = depth * brightness
         depth = np.clip(depth, 0.0, 1.0)
 
-        # Apply colormap if enabled
-        if scriptOp.par.Colorize.eval():
-            depth_rgb = apply_colormap(depth, scriptOp.par.Colormap.eval())
+        # Apply colormap if enabled (read from parent parameters)
+        if comp.par.Colorize.eval():
+            colormap_name = comp.par.Colormap.eval()
+            depth_rgb = apply_colormap(depth, colormap_name)
         else:
             # Grayscale - stack to RGB
             depth_rgb = np.stack([depth] * 3, axis=-1)
