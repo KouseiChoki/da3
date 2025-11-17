@@ -1,0 +1,218 @@
+# Comprehensive Benchmark Configuration
+# Tests multiple models with various configurations:
+# - Different resolutions
+# - FP16 vs FP32 precision (fp16 only supported on CUDA)
+# - Multi-camera setups
+# Estimated time: ~1-2 hours on MPS
+#
+# Note: fp16 precision requires CUDA. On MPS/CPU, fp16 scenarios will
+# automatically fall back to fp32 with a warning.
+
+name: "Comprehensive Streaming Benchmark"
+description: "Full benchmark testing models across resolutions, precisions, and multi-camera setups"
+
+# Provide your own test video for realistic results
+# input_video: "path/to/test_video.mp4"
+
+output_dir: "benchmark_results/comprehensive"
+
+compare_against_baseline: true
+baseline_scenario_name: "DA3-BASE_1cam_512x512_fp32"
+
+scenarios:
+  # ========================================================================
+  # DA3-SMALL Tests
+  # ========================================================================
+  - name: "DA3-SMALL_1cam_256x256_fp32"
+    model:
+      name: "DA3-SMALL"
+      model_dir: "depth-anything/DA3-SMALL"
+    num_cameras: 1
+    resolution: [256, 256]
+    precision: "fp32"
+    device: "mps"
+    num_frames: 100
+    warmup_frames: 10
+    save_depth_maps: true
+    save_comparison_video: true
+
+  - name: "DA3-SMALL_1cam_512x512_fp32"
+    model:
+      name: "DA3-SMALL"
+      model_dir: "depth-anything/DA3-SMALL"
+    num_cameras: 1
+    resolution: [512, 512]
+    precision: "fp32"
+    device: "mps"
+    num_frames: 100
+    warmup_frames: 10
+    save_depth_maps: true
+    save_comparison_video: true
+
+  # - name: "DA3-SMALL_1cam_512x512_fp16"
+  #   model:
+  #     name: "DA3-SMALL"
+  #     model_dir: "depth-anything/DA3-SMALL"
+  #   num_cameras: 1
+  #   resolution: [512, 512]
+  #   precision: "fp16"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: true
+  #   save_comparison_video: true
+
+  - name: "DA3-SMALL_1cam_1024x1024_fp32"
+    model:
+      name: "DA3-SMALL"
+      model_dir: "depth-anything/DA3-SMALL"
+    num_cameras: 1
+    resolution: [1024, 1024]
+    precision: "fp32"
+    device: "mps"
+    num_frames: 100
+    warmup_frames: 10
+    save_depth_maps: false
+    save_comparison_video: false
+
+  # Multi-camera scenarios commented out - not properly implemented yet
+  # TODO: Implement actual multi-camera support (different views/angles)
+  # - name: "DA3-SMALL_2cam_512x512_fp32"
+  #   model:
+  #     name: "DA3-SMALL"
+  #     model_dir: "depth-anything/DA3-SMALL"
+  #   num_cameras: 2
+  #   resolution: [512, 512]
+  #   precision: "fp32"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: false
+  #   save_comparison_video: false
+
+  # ========================================================================
+  # DA3-BASE Tests
+  # ========================================================================
+
+  - name: "DA3-BASE_1cam_256x256_fp32"
+    model:
+      name: "DA3-BASE"
+      model_dir: "depth-anything/DA3-BASE"
+    num_cameras: 1
+    resolution: [256, 256]
+    precision: "fp32"
+    device: "mps"
+    num_frames: 100
+    warmup_frames: 10
+    save_depth_maps: true
+    save_comparison_video: true
+
+  - name: "DA3-BASE_1cam_512x512_fp32"
+    model:
+      name: "DA3-BASE"
+      model_dir: "depth-anything/DA3-BASE"
+    num_cameras: 1
+    resolution: [512, 512]
+    precision: "fp32"
+    device: "mps"
+    num_frames: 100
+    warmup_frames: 10
+    save_depth_maps: true
+    save_comparison_video: true
+
+  # - name: "DA3-BASE_1cam_512x512_fp16"
+  #   model:
+  #     name: "DA3-BASE"
+  #     model_dir: "depth-anything/DA3-BASE"
+  #   num_cameras: 1
+  #   resolution: [512, 512]
+  #   precision: "fp16"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: true
+  #   save_comparison_video: true
+
+  - name: "DA3-BASE_1cam_1024x1024_fp32"
+    model:
+      name: "DA3-BASE"
+      model_dir: "depth-anything/DA3-BASE"
+    num_cameras: 1
+    resolution: [1024, 1024]
+    precision: "fp32"
+    device: "mps"
+    num_frames: 100
+    warmup_frames: 10
+    save_depth_maps: false
+    save_comparison_video: false
+
+  # Multi-camera scenarios commented out - not properly implemented yet
+  # TODO: Implement actual multi-camera support (different views/angles)
+  # - name: "DA3-BASE_2cam_512x512_fp32"
+  #   model:
+  #     name: "DA3-BASE"
+  #     model_dir: "depth-anything/DA3-BASE"
+  #   num_cameras: 2
+  #   resolution: [512, 512]
+  #   precision: "fp32"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: false
+  #   save_comparison_video: false
+
+  # - name: "DA3-BASE_3cam_512x512_fp32"
+  #   model:
+  #     name: "DA3-BASE"
+  #     model_dir: "depth-anything/DA3-BASE"
+  #   num_cameras: 3
+  #   resolution: [512, 512]
+  #   precision: "fp32"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: false
+  #   save_comparison_video: false
+
+  # ========================================================================
+  # DA3-LARGE Tests
+  # ========================================================================
+
+  # - name: "DA3-LARGE_1cam_512x512_fp32"
+  #   model:
+  #     name: "DA3-LARGE"
+  #     model_dir: "depth-anything/DA3-LARGE"
+  #   num_cameras: 1
+  #   resolution: [512, 512]
+  #   precision: "fp32"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: true
+  #   save_comparison_video: true
+
+  # - name: "DA3-LARGE_1cam_512x512_fp16"
+  #   model:
+  #     name: "DA3-LARGE"
+  #     model_dir: "depth-anything/DA3-LARGE"
+  #   num_cameras: 1
+  #   resolution: [512, 512]
+  #   precision: "fp16"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: true
+  #   save_comparison_video: true
+
+  # - name: "DA3-LARGE_1cam_1024x1024_fp32"
+  #   model:
+  #     name: "DA3-LARGE"
+  #     model_dir: "depth-anything/DA3-LARGE"
+  #   num_cameras: 1
+  #   resolution: [1024, 1024]
+  #   precision: "fp32"
+  #   device: "mps"
+  #   num_frames: 100
+  #   warmup_frames: 10
+  #   save_depth_maps: false
+  #   save_comparison_video: false

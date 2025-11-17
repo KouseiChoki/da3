@@ -1,0 +1,594 @@
+# Copyright (c) 2025 ByteDance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Report Generation
+
+Creates HTML reports with charts and visualizations for benchmark results.
+"""
+
+from pathlib import Path
+from typing import List, Dict, Any
+import json
+from datetime import datetime
+
+from .metrics import BenchmarkMetrics
+
+
+class ReportGenerator:
+    """
+    Generates HTML reports from benchmark results.
+    """
+
+    def __init__(self, output_dir: Path):
+        self.output_dir = output_dir
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def generate(
+        self,
+        results: List[BenchmarkMetrics],
+        benchmark_name: str,
+        description: str = "",
+    ) -> Path:
+        """
+        Generate HTML report from benchmark results.
+
+        Args:
+            results: List of benchmark metrics
+            benchmark_name: Name of the benchmark
+            description: Optional description
+
+        Returns:
+            Path to generated HTML report
+        """
+        report_path = self.output_dir / "report.html"
+
+        # Generate HTML
+        html = self._generate_html(results, benchmark_name, description)
+
+        # Write to file
+        with open(report_path, 'w') as f:
+            f.write(html)
+
+        print(f"📄 Generated HTML report: {report_path}")
+        return report_path
+
+    def _generate_html(
+        self,
+        results: List[BenchmarkMetrics],
+        benchmark_name: str,
+        description: str,
+    ) -> str:
+        """Generate complete HTML report."""
+        # Prepare data for charts
+        chart_data = self._prepare_chart_data(results)
+
+        # Generate HTML sections
+        header = self._generate_header(benchmark_name, description)
+        summary = self._generate_summary_table(results)
+        charts = self._generate_charts(chart_data)
+        detailed = self._generate_detailed_results(results)
+
+        # Combine into full HTML
+        html = f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{benchmark_name} - Benchmark Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        {self._get_css()}
+    </style>
+</head>
+<body>
+    {header}
+    <div class="container">
+        {summary}
+        {charts}
+        {detailed}
+    </div>
+    <script>
+        {self._generate_chart_scripts(chart_data)}
+    </script>
+</body>
+</html>
+"""
+        return html
+
+    def _get_css(self) -> str:
+        """Get CSS styles for the report."""
+        return """
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .header .timestamp {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .metric-good {
+            color: #28a745;
+        }
+
+        .metric-warning {
+            color: #ffc107;
+        }
+
+        .metric-bad {
+            color: #dc3545;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .scenario-details {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .scenario-details h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .comparison-note {
+            background: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        """
+
+    def _generate_header(self, benchmark_name: str, description: str) -> str:
+        """Generate report header."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return f"""
+        <div class="header">
+            <h1>📊 {benchmark_name}</h1>
+            <div class="subtitle">{description}</div>
+            <div class="timestamp">Generated: {timestamp}</div>
+        </div>
+        """
+
+    def _generate_summary_table(self, results: List[BenchmarkMetrics]) -> str:
+        """Generate summary table comparing all scenarios."""
+        rows = []
+        for metric in results:
+            rows.append(f"""
+            <tr>
+                <td><strong>{metric.scenario_name}</strong></td>
+                <td class="metric-value">{metric.avg_fps:.2f}</td>
+                <td>{metric.avg_latency_ms:.2f}</td>
+                <td>{metric.p95_latency_ms:.2f}</td>
+                <td>{metric.avg_memory_mb:.2f}</td>
+                <td>{metric.max_memory_mb:.2f}</td>
+            </tr>
+            """)
+
+        return f"""
+        <div class="section">
+            <h2>📈 Performance Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Avg FPS</th>
+                        <th>Avg Latency (ms)</th>
+                        <th>P95 Latency (ms)</th>
+                        <th>Avg Memory (MB)</th>
+                        <th>Peak Memory (MB)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {''.join(rows)}
+                </tbody>
+            </table>
+        </div>
+        """
+
+    def _prepare_chart_data(self, results: List[BenchmarkMetrics]) -> Dict[str, Any]:
+        """Prepare data for charts."""
+        scenario_names = [r.scenario_name for r in results]
+
+        return {
+            "scenarios": scenario_names,
+            "fps": [r.avg_fps for r in results],
+            "latency_avg": [r.avg_latency_ms for r in results],
+            "latency_p95": [r.p95_latency_ms for r in results],
+            "memory_avg": [r.avg_memory_mb for r in results],
+            "memory_max": [r.max_memory_mb for r in results],
+            "frame_data": {
+                r.scenario_name: [fm.total_time_ms for fm in r.frame_metrics]
+                for r in results
+            }
+        }
+
+    def _generate_charts(self, data: Dict[str, Any]) -> str:
+        """Generate chart containers."""
+        return f"""
+        <div class="section">
+            <h2>📊 Performance Charts</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="fpsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="memoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="frameTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        """
+
+    def _generate_chart_scripts(self, data: Dict[str, Any]) -> str:
+        """Generate JavaScript for charts."""
+        # Convert data to JSON
+        scenarios_json = json.dumps(data["scenarios"])
+        fps_json = json.dumps(data["fps"])
+        latency_avg_json = json.dumps(data["latency_avg"])
+        latency_p95_json = json.dumps(data["latency_p95"])
+        memory_avg_json = json.dumps(data["memory_avg"])
+        memory_max_json = json.dumps(data["memory_max"])
+
+        # Get first scenario's frame data for timeline chart
+        first_scenario = data["scenarios"][0] if data["scenarios"] else ""
+        frame_times = data["frame_data"].get(first_scenario, [])
+        frame_indices = list(range(len(frame_times)))
+        frame_times_json = json.dumps(frame_times)
+        frame_indices_json = json.dumps(frame_indices)
+
+        return f"""
+        // FPS Chart
+        new Chart(document.getElementById('fpsChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {scenarios_json},
+                datasets: [{{
+                    label: 'Average FPS',
+                    data: {fps_json},
+                    backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Average FPS Comparison'
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        title: {{
+                            display: true,
+                            text: 'FPS'
+                        }}
+                    }}
+                }}
+            }}
+        }});
+
+        // Latency Chart
+        new Chart(document.getElementById('latencyChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {scenarios_json},
+                datasets: [
+                    {{
+                        label: 'Avg Latency',
+                        data: {latency_avg_json},
+                        backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 2
+                    }},
+                    {{
+                        label: 'P95 Latency',
+                        data: {latency_p95_json},
+                        backgroundColor: 'rgba(255, 193, 7, 0.5)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 2
+                    }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Latency Comparison (ms)'
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        title: {{
+                            display: true,
+                            text: 'Milliseconds'
+                        }}
+                    }}
+                }}
+            }}
+        }});
+
+        // Memory Chart
+        new Chart(document.getElementById('memoryChart'), {{
+            type: 'bar',
+            data: {{
+                labels: {scenarios_json},
+                datasets: [
+                    {{
+                        label: 'Avg Memory',
+                        data: {memory_avg_json},
+                        backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2
+                    }},
+                    {{
+                        label: 'Peak Memory',
+                        data: {memory_max_json},
+                        backgroundColor: 'rgba(111, 66, 193, 0.5)',
+                        borderColor: 'rgba(111, 66, 193, 1)',
+                        borderWidth: 2
+                    }}
+                ]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Memory Usage (MB)'
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        title: {{
+                            display: true,
+                            text: 'Megabytes'
+                        }}
+                    }}
+                }}
+            }}
+        }});
+
+        // Frame Time Chart (first scenario only)
+        new Chart(document.getElementById('frameTimeChart'), {{
+            type: 'line',
+            data: {{
+                labels: {frame_indices_json},
+                datasets: [{{
+                    label: '{first_scenario}',
+                    data: {frame_times_json},
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 1
+                }}]
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    title: {{
+                        display: true,
+                        text: 'Frame Processing Time (First Scenario)'
+                    }}
+                }},
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        title: {{
+                            display: true,
+                            text: 'Time (ms)'
+                        }}
+                    }},
+                    x: {{
+                        title: {{
+                            display: true,
+                            text: 'Frame Index'
+                        }}
+                    }}
+                }}
+            }}
+        }});
+        """
+
+    def _generate_detailed_results(self, results: List[BenchmarkMetrics]) -> str:
+        """Generate detailed results for each scenario."""
+        sections = []
+
+        for metric in results:
+            stats_cards = f"""
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Avg FPS</div>
+                    <div class="stat-value">{metric.avg_fps:.2f}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min FPS</div>
+                    <div class="stat-value">{metric.min_fps:.2f}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Max FPS</div>
+                    <div class="stat-value">{metric.max_fps:.2f}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Latency</div>
+                    <div class="stat-value">{metric.avg_latency_ms:.1f}ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P95 Latency</div>
+                    <div class="stat-value">{metric.p95_latency_ms:.1f}ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">P99 Latency</div>
+                    <div class="stat-value">{metric.p99_latency_ms:.1f}ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Memory</div>
+                    <div class="stat-value">{metric.avg_memory_mb:.1f}MB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peak Memory</div>
+                    <div class="stat-value">{metric.max_memory_mb:.1f}MB</div>
+                </div>
+            </div>
+            """
+
+            sections.append(f"""
+            <div class="scenario-details">
+                <h3>{metric.scenario_name}</h3>
+                <p><strong>Device:</strong> {metric.device} | <strong>Total Frames:</strong> {metric.total_frames} | <strong>Total Time:</strong> {metric.total_time_s:.2f}s</p>
+                {stats_cards}
+            </div>
+            """)
+
+        return f"""
+        <div class="section">
+            <h2>🔍 Detailed Results</h2>
+            {''.join(sections)}
+        </div>
+        """
