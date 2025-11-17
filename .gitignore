@@ -39,3 +39,4 @@ temp*.png
 .claude/
 CLAUDE.md
 .lh/
+benchmark_results/
