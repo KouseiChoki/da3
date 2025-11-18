@@ -164,7 +164,7 @@ class ModelInference:
 
         # Run model inference
         print(f"Running inference with method: {actual_method}")
-        with torch.no_grad():
+        with torch.inference_mode():
             prediction = self.model.inference(
                 image_paths, export_dir=None, process_res_method=actual_method, infer_gs=infer_gs
             )

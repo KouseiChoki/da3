@@ -594,13 +594,31 @@ def backend(
     host: str = typer.Option("127.0.0.1", help="Host to bind to"),
     port: int = typer.Option(8008, help="Port to bind to"),
     gallery_dir: str = typer.Option(DEFAULT_GALLERY_DIR, help="Gallery directory path (optional)"),
+    log_level: str = typer.Option("INFO", help="Logging level (DEBUG, INFO, WARNING, ERROR)"),
 ):
     """Start model backend service with integrated gallery."""
+    import logging
+
+    # Configure logging
+    log_level_map = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+    }
+    numeric_level = log_level_map.get(log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=numeric_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
     typer.echo("=" * 60)
     typer.echo("🚀 Starting Depth Anything 3 Backend Server")
     typer.echo("=" * 60)
     typer.echo(f"Model directory: {model_dir}")
     typer.echo(f"Device: {device}")
+    typer.echo(f"Log level: {log_level.upper()}")
 
     # Check if gallery directory exists
     if gallery_dir and os.path.exists(gallery_dir):
@@ -932,6 +950,7 @@ def stream(
     buffer_size: int = typer.Option(None, help="Default buffer size before processing"),
     max_fps: float = typer.Option(None, help="Default max FPS limit"),
     quality: int = typer.Option(85, help="Default JPEG quality for depth output (0-100)"),
+    log_level: str = typer.Option("INFO", help="Logging level (DEBUG, INFO, WARNING, ERROR)"),
 ):
     """
     Start real-time streaming server for depth estimation.
@@ -950,10 +969,27 @@ def stream(
         2. Send JPEG frames via WebSocket
         3. Receive depth maps in real-time
     """
+    import logging
+
+    # Configure logging
+    log_level_map = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+    }
+    numeric_level = log_level_map.get(log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=numeric_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
     typer.echo("=" * 60)
     typer.echo("🌊 Starting Depth Anything 3 Streaming Server")
     typer.echo("=" * 60)
     typer.echo(f"Model directory: {model_dir}")
+    typer.echo(f"Log level: {log_level.upper()}")
 
     # Auto-detect device if not specified
     if device is None:

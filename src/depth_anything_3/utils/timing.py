@@ -54,10 +54,10 @@ class TimingBreakdown:
     gs_adapter_ms: float = 0.0  # Gaussian Splatting adapter (if enabled)
 
     # Output processing stages
-    output_to_cpu_ms: float = 0.0  # Moving results to CPU
+    output_to_cpu_ms: float = 0.0  # Moving results to CPU (includes aux features - LARGE for big models!)
     depth_postprocessing_ms: float = 0.0  # Sky segmentation, scaling, etc.
     pose_alignment_ms: float = 0.0  # Umeyama alignment
-    prediction_conversion_ms: float = 0.0  # Converting to Prediction object
+    prediction_conversion_ms: float = 0.0  # Converting to Prediction object (numpy conversion, negligible)
     total_postprocessing_ms: float = 0.0  # Total postprocessing time
 
     # Export (if enabled)

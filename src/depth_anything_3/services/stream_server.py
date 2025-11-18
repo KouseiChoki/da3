@@ -30,11 +30,14 @@ from typing import Optional
 import asyncio
 from contextlib import asynccontextmanager
 import time
+import logging
 
 from ..api import DepthAnything3
 from .streaming import StreamingDepthEstimator, StreamConfig
 from ..utils.sliding_window import WindowConfig
 
+# Configure logging
+logger = logging.getLogger("da3.stream")
 
 # Global state
 stream_estimator: Optional[StreamingDepthEstimator] = None
@@ -46,10 +49,10 @@ async def lifespan(app: FastAPI):
     """Initialize model on startup."""
     global model, stream_estimator
     # Startup
-    print("🚀 Starting Depth Anything 3 Streaming Server...")
+    logger.info("Starting Depth Anything 3 Streaming Server...")
     yield
     # Shutdown
-    print("👋 Shutting down streaming server...")
+    logger.info("Shutting down streaming server...")
 
 
 app = FastAPI(
@@ -72,11 +75,11 @@ app.add_middleware(
 def init_model(model_dir: str, device: str, process_res: int = 504):
     """Initialize the model."""
     global model, stream_estimator
-    print(f"📦 Loading model from {model_dir} on {device}...")
-    print(f"⚙️  Process resolution: {process_res}")
+    logger.info(f"Loading model from {model_dir} on {device}")
+    logger.info(f"Process resolution: {process_res}")
     model = DepthAnything3.from_pretrained(model_dir).to(device)
     stream_estimator = StreamingDepthEstimator(model, device=device, process_res=process_res)
-    print(f"✅ Model loaded and ready for streaming")
+    logger.info("Model loaded and ready for streaming")
 
 
 @app.get("/")
@@ -205,14 +208,13 @@ async def websocket_endpoint(
         3. Send JPEG frames using webSocketDAT.sendBinary(jpeg_bytes)
         4. Receive depth maps via callbacks DAT
     """
-    print("=" * 60)
-    print("🔌 NEW WebSocket connection incoming...")
+    logger.info("New WebSocket connection incoming")
 
     try:
         await websocket.accept()
-        print("✅ WebSocket connection ACCEPTED")
+        logger.info("WebSocket connection accepted")
     except Exception as e:
-        print(f"❌ Failed to accept WebSocket connection: {e}")
+        logger.error(f"Failed to accept WebSocket connection: {e}")
         return
 
     # Parse configuration from query params
@@ -220,8 +222,7 @@ async def websocket_endpoint(
 
     # Create per-connection stream estimator with custom config
     if window_size is not None or overlap is not None or buffer_size is not None:
-        print(f"📝 Creating custom config from query params:")
-        print(f"   window_size={window_size}, overlap={overlap}, buffer_size={buffer_size}")
+        logger.info(f"Creating custom config: window_size={window_size}, overlap={overlap}, buffer_size={buffer_size}")
 
         # StreamingDepthEstimator uses buffer_size as window_size
         config = StreamConfig.for_device(device)
@@ -241,19 +242,18 @@ async def websocket_endpoint(
         )
     else:
         # Use global estimator
-        print(f"📝 Using default config")
+        logger.debug("Using default config")
         per_conn_estimator = stream_estimator
 
-    print(f"⚙️  Active Config:")
-    print(f"   - Buffer size: {per_conn_estimator.config.buffer_size}")
-    print(f"   - Overlap: {per_conn_estimator.config.overlap}")
-    print(f"   - Output latency: {per_conn_estimator.config.output_latency_frames}")
-    print(f"   - Max FPS: {max_fps or 'unlimited'}")
-    print(f"   - JPEG quality: {quality}")
-    print("=" * 60)
+    logger.info(
+        f"Stream config: buffer={per_conn_estimator.config.buffer_size}, "
+        f"overlap={per_conn_estimator.config.overlap}, "
+        f"latency={per_conn_estimator.config.output_latency_frames}, "
+        f"max_fps={max_fps or 'unlimited'}, quality={quality}"
+    )
 
     if per_conn_estimator is None:
-        print("❌ ERROR: Estimator is None!")
+        logger.error("Estimator is None!")
         await websocket.send_json({"error": "Model not initialized"})
         await websocket.close()
         return
@@ -264,11 +264,11 @@ async def websocket_endpoint(
     frame_count = 0
 
     try:
-        print("👂 Waiting for frames from client...")
+        logger.debug("Waiting for frames from client")
 
         while True:
             # Receive image data
-            print(f"\n🔄 Waiting for frame #{frame_count + 1}...")
+            logger.debug(f"Waiting for frame #{frame_count + 1}")
 
             # Initialize seq_id for this frame
             seq_id = None
@@ -281,7 +281,7 @@ async def websocket_endpoint(
                 if msg_type == 'websocket.receive':
                     if 'bytes' in message:
                         data = message['bytes']
-                        print(f"Received BINARY: {len(data)} bytes")
+                        logger.debug(f"Received BINARY: {len(data)} bytes")
                     elif 'text' in message:
                         text = message['text']
                         # Check if it's numpy metadata (JSON)
@@ -294,9 +294,9 @@ async def websocket_endpoint(
                                 bin_msg = await websocket.receive()
                                 if 'bytes' in bin_msg:
                                     data = bin_msg['bytes']
-                                    print(f"Received numpy: {len(data)} bytes [seq={seq_id}]")
+                                    logger.debug(f"Received numpy: {len(data)} bytes [seq={seq_id}]")
                                 else:
-                                    print("Expected binary after numpy metadata")
+                                    logger.warning("Expected binary after numpy metadata")
                                     continue
                             else:
                                 await websocket.send_json({
@@ -311,14 +311,14 @@ async def websocket_endpoint(
                             })
                             continue
                     else:
-                        print(f"Unknown message format: {message}")
+                        logger.warning(f"Unknown message format: {message}")
                         continue
                 else:
-                    print(f"Unexpected message type: {msg_type}")
+                    logger.warning(f"Unexpected message type: {msg_type}")
                     continue
 
             except Exception as e:
-                print(f"Error receiving data: {e}")
+                logger.error(f"Error receiving data: {e}")
                 import traceback
                 traceback.print_exc()
                 break
@@ -331,7 +331,7 @@ async def websocket_endpoint(
                 elapsed = current_time - last_frame_time
                 if elapsed < min_frame_time:
                     # Skip frame
-                    print(f"Frame #{frame_count} THROTTLED (max_fps={max_fps})")
+                    logger.debug(f"Frame #{frame_count} THROTTLED (max_fps={max_fps})")
                     await websocket.send_json({
                         "status": "throttled",
                         "message": f"Frame skipped (max_fps={max_fps})",
@@ -340,7 +340,7 @@ async def websocket_endpoint(
                 last_frame_time = current_time
 
             # Decode image
-            print(f"Decoding frame #{frame_count}...")
+            logger.debug(f"Decoding frame #{frame_count}")
 
             # Try numpy format first (more efficient)
             if 'metadata' in locals() and metadata.get('format') == 'numpy':
@@ -348,9 +348,9 @@ async def websocket_endpoint(
                     h, w, c = metadata['shape']
                     dtype = metadata.get('dtype', 'uint8')
                     frame = np.frombuffer(data, dtype=dtype).reshape((h, w, c))
-                    print(f"Frame #{frame_count} decoded from numpy: {frame.shape}")
+                    logger.debug(f"Frame #{frame_count} decoded from numpy: {frame.shape}")
                 except Exception as e:
-                    print(f"Failed to decode numpy: {e}")
+                    logger.warning(f"Failed to decode numpy: {e}")
                     await websocket.send_json({"error": "Failed to decode numpy"})
                     continue
             else:
@@ -359,29 +359,29 @@ async def websocket_endpoint(
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
                 if frame is None:
-                    print(f"Failed to decode frame #{frame_count}")
+                    logger.warning(f"Failed to decode frame #{frame_count}")
                     await websocket.send_json({"error": "Failed to decode image"})
                     continue
 
-                print(f"Frame #{frame_count} decoded from JPEG: {frame.shape}")
+                logger.debug(f"Frame #{frame_count} decoded from JPEG: {frame.shape}")
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             # Process frame
-            print(f"🧠 Processing frame #{frame_count}...")
+            logger.debug(f"Processing frame #{frame_count}")
             depth = per_conn_estimator.process_frame(frame)
 
             if depth is None:
                 # Still buffering
                 stats = per_conn_estimator.get_stats()
                 buffer_fill = stats.get('frames_in_buffer', 0)
-                print(f"⏳ BUFFERING... ({buffer_fill}/{per_conn_estimator.config.buffer_size} frames)")
+                logger.debug(f"Buffering... ({buffer_fill}/{per_conn_estimator.config.buffer_size} frames)")
                 await websocket.send_json({
                     "status": "buffering",
                     "stats": stats,
                 })
                 continue
 
-            print(f"✅ Depth computed: {depth.shape}")
+            logger.debug(f"Depth computed: {depth.shape}")
 
             # Option 1: Send as JPEG (smaller, uint8, requires decoding)
             if quality < 100:
@@ -400,7 +400,7 @@ async def websocket_endpoint(
                 depth_min = float(depth.min())
                 depth_max = float(depth.max())
 
-            print(f"Sending depth map ({len(depth_b64)} chars base64, format={data_format}, seq={seq_id})")
+            logger.debug(f"Sending depth map (format={data_format}, seq={seq_id})")
 
             # Send response with seq_id for frame synchronization
             await websocket.send_json({
@@ -415,12 +415,12 @@ async def websocket_endpoint(
                 "stats": per_conn_estimator.get_stats(),
             })
 
-            print(f"✅ Frame #{frame_count} complete [seq={seq_id}]!")
+            logger.debug(f"Frame #{frame_count} complete [seq={seq_id}]")
 
     except WebSocketDisconnect:
-        print(f"\n👋 WebSocket client disconnected (processed {frame_count} frames)")
+        logger.info(f"WebSocket client disconnected (processed {frame_count} frames)")
     except Exception as e:
-        print(f"\n❌ WebSocket error: {e}")
+        logger.error(f"WebSocket error: {e}")
         import traceback
         traceback.print_exc()
         try:

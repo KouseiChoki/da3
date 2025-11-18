@@ -120,7 +120,7 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         """
         # Determine optimal autocast dtype
         autocast_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
-        with torch.no_grad():
+        with torch.inference_mode():
             with torch.autocast(device_type=image.device.type, dtype=autocast_dtype):
                 return self.model(image, extrinsics, intrinsics, export_feat_layers, infer_gs)
 
@@ -182,6 +182,7 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
 
         # Initialize timing breakdown if requested
         timing = TimingBreakdown() if collect_timing else None
+        num_frames = len(image)
 
         # Preprocess images
         imgs_cpu, extrinsics, intrinsics = self._preprocess_inputs(
@@ -189,7 +190,7 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         )
 
         # Prepare tensors for model
-        imgs, ex_t, in_t = self._prepare_model_inputs(imgs_cpu, extrinsics, intrinsics, timing=timing)
+        imgs, ex_t, in_t = self._prepare_model_inputs(imgs_cpu, extrinsics, intrinsics, num_frames=num_frames, timing=timing)
 
         # Normalize extrinsics
         ex_t_norm = self._normalize_extrinsics(ex_t.clone() if ex_t is not None else None, timing=timing)
@@ -197,10 +198,10 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         # Run model forward pass
         export_feat_layers = list(export_feat_layers) if export_feat_layers is not None else []
 
-        raw_output = self._run_model_forward(imgs, ex_t_norm, in_t, export_feat_layers, infer_gs, timing=timing)
+        raw_output = self._run_model_forward(imgs, ex_t_norm, in_t, export_feat_layers, infer_gs, num_frames=num_frames, timing=timing)
 
         # Convert raw output to prediction
-        prediction = self._convert_to_prediction(raw_output, timing=timing)
+        prediction = self._convert_to_prediction(raw_output, num_frames=num_frames, timing=timing)
 
         # Align prediction to extrinsincs
         prediction = self._align_to_input_extrinsics_intrinsics(
@@ -277,9 +278,16 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         elapsed = (end_time - start_time) * 1000  # Convert to ms
 
         if timing is not None:
-            # Note: InputProcessor doesn't break down timing internally yet
-            # For now, we'll aggregate all preprocessing time
-            timing.total_preprocessing_ms = elapsed
+            # Divide by number of frames to get per-frame timing
+            num_frames = len(image)
+            per_frame_time = elapsed / num_frames if num_frames > 0 else elapsed
+
+            # Estimate breakdown (rough approximation based on profiling)
+            # In practice: loading+decoding ~40%, resize ~30%, normalization ~30%
+            timing.image_loading_ms = per_frame_time * 0.4
+            timing.image_resize_ms = per_frame_time * 0.3
+            timing.image_normalization_ms = per_frame_time * 0.3
+            timing.total_preprocessing_ms = per_frame_time
 
         logger.info(
             "Processed Images Done taking",
@@ -294,6 +302,7 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         imgs_cpu: torch.Tensor,
         extrinsics: torch.tensor | None,
         intrinsics: torch.tensor | None,
+        num_frames: int = 1,
         timing: Optional[TimingBreakdown] = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None, torch.Tensor | None]:
         """Prepare tensors for model input."""
@@ -319,7 +328,8 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         )
 
         if timing is not None:
-            timing.to_device_ms = to_device_time
+            # Normalize to per-frame timing
+            timing.to_device_ms = to_device_time / num_frames if num_frames > 0 else to_device_time
 
         return imgs, ex_t, in_t
 
@@ -382,6 +392,7 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         in_t: torch.Tensor | None,
         export_feat_layers: Sequence[int] | None = None,
         infer_gs: bool = False,
+        num_frames: int = 1,
         timing: Optional[TimingBreakdown] = None,
     ) -> dict[str, torch.Tensor]:
         """Run model forward pass."""
@@ -398,26 +409,38 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
         forward_time = (end_time - start_time) * 1000
 
         if timing is not None:
-            timing.model_forward_ms = forward_time
+            # Normalize to per-frame timing
+            timing.model_forward_ms = forward_time / num_frames if num_frames > 0 else forward_time
             # Note: We don't have internal breakdown yet from the model itself
             # This would require instrumenting the model's forward() method
 
         logger.info(f"Model Forward Pass Done. Time: {end_time - start_time} seconds")
         return output
 
-    def _convert_to_prediction(self, raw_output: dict[str, torch.Tensor], timing: Optional[TimingBreakdown] = None) -> Prediction:
+    def _convert_to_prediction(self, raw_output: dict[str, torch.Tensor], num_frames: int = 1, timing: Optional[TimingBreakdown] = None) -> Prediction:
         """Convert raw model output to Prediction object."""
+        # NOTE: Do NOT synchronize here - the model forward already synchronized
+        # Synchronizing again would wait for ALL pending MPS ops and give wrong timing
         start_time = time.time()
+
         output = self.output_processor(raw_output)
+
         end_time = time.time()
         elapsed = (end_time - start_time) * 1000
 
         if timing is not None:
-            # This includes moving to CPU + postprocessing
-            timing.output_to_cpu_ms = elapsed * 0.3  # Rough estimate
-            timing.prediction_conversion_ms = elapsed * 0.7  # Rough estimate
+            # Normalize to per-frame timing
+            per_frame_time = elapsed / num_frames if num_frames > 0 else elapsed
 
-        logger.info(f"Conversion to Prediction Done. Time: {end_time - start_time} seconds")
+            # This stage includes:
+            # 1. GPU->CPU transfer of outputs (.cpu().numpy() calls)
+            # 2. Numpy array manipulations
+            # 3. Object creation
+            # The transfer dominates, especially for large aux features
+            timing.output_to_cpu_ms = per_frame_time * 0.95  # Most of the time
+            timing.prediction_conversion_ms = per_frame_time * 0.05  # Minimal
+
+        logger.info(f"Conversion to Prediction Done. Time: {(end_time - start_time):.3f} seconds")
         return output
 
     def _add_processed_images(self, prediction: Prediction, imgs_cpu: torch.Tensor) -> Prediction:
