@@ -79,7 +79,7 @@ We introduce a new benchmark to rigorously evaluate geometry prediction models o
 
 
 ## 🚀 Quick Start
-
+picture -> backbone -> encoder -> DPT -> decoder -> output
 ### 📦 Installation
 
 ```bash

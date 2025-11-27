@@ -804,13 +804,13 @@ def create_app(model_dir: str, device: str = "cuda", gallery_dir: Optional[str] 
         <div class="nav-grid">
             <a href="/dashboard" class="nav-card">
                 <h2>📊 Dashboard</h2>
-                <p>Monitor backend status, model information, and inference tasks in real-time.</p>
+                <p>在线查看服务器进程及占用.</p>
             </a>
             """
             + (
                 '<a href="/gallery/" class="nav-card">'
                 "<h2>🎨 Gallery</h2>"
-                "<p>Browse 3D reconstructions and depth visualizations from processed scenes.</p>"
+                "<p>Depth结果在这里，部分结果只供在线浏览，剩余部分锐意开发中</p>"
                 "</a>"
                 if _gallery_dir and os.path.exists(_gallery_dir)
                 else ""

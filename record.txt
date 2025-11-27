@@ -1,0 +1,3 @@
+da3 auto /home/truecut/kousei/Depth-Anything-3/assets/examples/SOH \
+    --export-dir /home/truecut/kousei/Depth-Anything-3/gallery/TEST_BACKEND/SOH \
+    --use-backend

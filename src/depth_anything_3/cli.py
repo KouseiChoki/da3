@@ -584,7 +584,7 @@ def video(
 def backend(
     model_dir: str = typer.Option(DEFAULT_MODEL, help="Model directory path"),
     device: str = typer.Option("cuda", help="Device to use"),
-    host: str = typer.Option("127.0.0.1", help="Host to bind to"),
+    host: str = typer.Option("0.0.0.0", help="Host to bind to"),
     port: int = typer.Option(8008, help="Port to bind to"),
     gallery_dir: str = typer.Option(DEFAULT_GALLERY_DIR, help="Gallery directory path (optional)"),
 ):
