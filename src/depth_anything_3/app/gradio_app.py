@@ -29,7 +29,7 @@ from depth_anything_3.app.modules.event_handlers import EventHandlers
 from depth_anything_3.app.modules.ui_components import UIComponents
 
 # Set environment variables
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 
 
 class DepthAnything3App:

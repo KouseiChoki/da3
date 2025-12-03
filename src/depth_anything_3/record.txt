@@ -1,0 +1,1 @@
+auto /home/truecut/kousei/data/FtGothicCastle/FtGothicCastle_01 --export-format exr --export-dir "/home/truecut/kousei/Depth-Anything-3/gallery/depth/test" --process-res 1920 --use-backend

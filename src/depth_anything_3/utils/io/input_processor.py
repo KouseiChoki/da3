@@ -30,7 +30,7 @@ from PIL import Image
 
 from depth_anything_3.utils.logger import logger
 from depth_anything_3.utils.parallel_utils import parallel_execution
-
+from depth_anything_3.utils.fileutils import read
 
 class InputProcessor:
     """Prepares a batch of images for model inference.
@@ -297,6 +297,8 @@ class InputProcessor:
     # -----------------------------
     def _load_image(self, img: np.ndarray | Image.Image | str) -> Image.Image:
         if isinstance(img, str):
+            if img[-4:].lower() == '.exr':
+                return Image.fromarray(read(img,type='image')).convert("RGB")
             return Image.open(img).convert("RGB")
         elif isinstance(img, np.ndarray):
             # Assume HxWxC uint8/RGB

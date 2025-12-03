@@ -11,5 +11,7 @@ done
 
 echo "输出目录: $EXPORT_DIR"
 /home/truecut/anaconda3/envs/mm/bin/da3 auto "$INPUT" \
+    --export-format exr\
+    --process-res 1920\
     --export-dir "$EXPORT_DIR" \
     --use-backend

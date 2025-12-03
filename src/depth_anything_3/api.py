@@ -253,6 +253,18 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
                         "process_res_method": process_res_method,
                     }
                 )
+
+            # Add exr export parameters
+            if "exr" in export_format:
+                if "exr" not in export_kwargs:
+                    export_kwargs["exr"] = {}
+                export_kwargs["exr"].update(
+                    {
+                        "image_paths": image,
+                        "extrinsics": render_exts,
+                        "intrinsics": render_ixts,
+                    }
+                )
             self._export_results(prediction, export_format, export_dir, **export_kwargs)
 
         return prediction

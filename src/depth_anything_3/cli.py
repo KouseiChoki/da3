@@ -40,17 +40,17 @@ from depth_anything_3.utils.constants import (
     DEFAULT_MODEL,
 )
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 
 app = typer.Typer(help="Depth Anything 3 - Video depth estimation CLI", add_completion=False)
-
+MAX_FRAME = 20
 
 # ============================================================================
 # Input type detection utilities
 # ============================================================================
 
 # Supported file extensions
-IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".tif"}
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".tif",'.exr'}
 VIDEO_EXTENSIONS = {".mp4", ".avi", ".mov", ".mkv", ".flv", ".wmv", ".webm", ".m4v"}
 
 
@@ -215,27 +215,47 @@ def auto(
     elif input_type == "images":
         typer.echo("Processing directory of images...")
         # Process input - use default extensions
-        image_files = ImagesHandler.process(input_path, "png,jpg,jpeg")
+        image_files = ImagesHandler.process(input_path, "png,jpg,jpeg,exr")
 
         # Handle export directory
         export_dir = InputHandler.handle_export_dir(export_dir, auto_cleanup)
-
+        if len(image_files)>= MAX_FRAME:
+            print(f'图片数量高于MAX_FRAME={MAX_FRAME},切片运行')
+            for i in range(0, len(image_files), MAX_FRAME):
+                print(f'正在运行第{i}至{i+MAX_FRAME}张')
+                chunk = image_files[i:i + MAX_FRAME]
+                run_inference(
+                image_paths=chunk,
+                export_dir=export_dir,
+                model_dir=model_dir,
+                device=device,
+                backend_url=final_backend_url,
+                export_format=export_format,
+                process_res=process_res,
+                process_res_method=process_res_method,
+                export_feat_layers=export_feat_layers,
+                conf_thresh_percentile=conf_thresh_percentile,
+                num_max_points=num_max_points,
+                show_cameras=show_cameras,
+                feat_vis_fps=feat_vis_fps,
+            )
+        else:
         # Run inference
-        run_inference(
-            image_paths=image_files,
-            export_dir=export_dir,
-            model_dir=model_dir,
-            device=device,
-            backend_url=final_backend_url,
-            export_format=export_format,
-            process_res=process_res,
-            process_res_method=process_res_method,
-            export_feat_layers=export_feat_layers,
-            conf_thresh_percentile=conf_thresh_percentile,
-            num_max_points=num_max_points,
-            show_cameras=show_cameras,
-            feat_vis_fps=feat_vis_fps,
-        )
+            run_inference(
+                image_paths=image_files,
+                export_dir=export_dir,
+                model_dir=model_dir,
+                device=device,
+                backend_url=final_backend_url,
+                export_format=export_format,
+                process_res=process_res,
+                process_res_method=process_res_method,
+                export_feat_layers=export_feat_layers,
+                conf_thresh_percentile=conf_thresh_percentile,
+                num_max_points=num_max_points,
+                show_cameras=show_cameras,
+                feat_vis_fps=feat_vis_fps,
+            )
 
     elif input_type == "video":
         typer.echo(f"Processing video with FPS={fps}...")
