@@ -10,8 +10,9 @@ while [ -d "$EXPORT_DIR" ]; do
 done
 
 echo "输出目录: $EXPORT_DIR"
-/home/truecut/anaconda3/envs/mm/bin/da3 auto "$INPUT" \
+/home/truecut/anaconda3/envs/da3/bin/da3 auto "$INPUT" \
     --export-format exr\
     --process-res 1920\
     --export-dir "$EXPORT_DIR" \
+    --max-frame 20\
     --use-backend

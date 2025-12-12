@@ -51,7 +51,7 @@ def export(
     elif export_format == "colmap":
         export_to_colmap(prediction, export_dir, **kwargs.get(export_format, {}))
     elif export_format == 'exr':
-        export_to_exr(prediction, export_dir)
+        export_to_exr(prediction, export_dir, **kwargs.get(export_format, {}))
     else:
         raise ValueError(f"Unsupported export format: {export_format}")
 

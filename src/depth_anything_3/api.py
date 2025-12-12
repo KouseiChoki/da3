@@ -258,11 +258,13 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
             if "exr" in export_format:
                 if "exr" not in export_kwargs:
                     export_kwargs["exr"] = {}
+                orig_hw = [imgs_cpu[0].shape[1], imgs_cpu[0].shape[2]]
                 export_kwargs["exr"].update(
                     {
-                        "image_paths": image,
-                        "extrinsics": render_exts,
-                        "intrinsics": render_ixts,
+                        # "image_paths": image,
+                        # "extrinsics": extrinsics, 
+                        # "intrinsics": intrinsics,
+                        "orig_hw": orig_hw, 
                     }
                 )
             self._export_results(prediction, export_format, export_dir, **export_kwargs)

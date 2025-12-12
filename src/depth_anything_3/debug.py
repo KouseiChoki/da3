@@ -1,5 +1,6 @@
-import sys
+import sys,os
 from depth_anything_3.cli import app
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 if __name__ == '__main__':
     if sys.argv[0].endswith('.exe'):
         sys.argv[0] = sys.argv[0][:-4]

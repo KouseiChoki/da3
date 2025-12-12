@@ -125,13 +125,13 @@ class DepthAnything3Net(nn.Module):
 
         feats, aux_feats = self.backbone(
             x, cam_token=cam_token, export_feat_layers=export_feat_layers
-        )
+        )#25489
         # feats = [[item for item in feat] for feat in feats]
         H, W = x.shape[-2], x.shape[-1]
 
         # Process features through depth head
         with torch.autocast(device_type=x.device.type, enabled=False):
-            output = self._process_depth_head(feats, H, W)
+            output = self._process_depth_head(feats, H, W) #75295
             output = self._process_camera_estimation(feats, H, W, output)
             if infer_gs:
                 output = self._process_gs_head(feats, H, W, output, x, extrinsics, intrinsics)

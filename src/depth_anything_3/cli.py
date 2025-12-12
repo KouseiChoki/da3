@@ -43,7 +43,7 @@ from depth_anything_3.utils.constants import (
 os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 
 app = typer.Typer(help="Depth Anything 3 - Video depth estimation CLI", add_completion=False)
-MAX_FRAME = 20
+
 
 # ============================================================================
 # Input type detection utilities
@@ -153,6 +153,7 @@ def auto(
     ),
     # Feat_vis export options
     feat_vis_fps: int = typer.Option(15, help="[FEAT_VIS] Frame rate for output video"),
+    max_frame:int = 10
 ):
     """
     Automatically detect input type and run appropriate processing.
@@ -219,11 +220,11 @@ def auto(
 
         # Handle export directory
         export_dir = InputHandler.handle_export_dir(export_dir, auto_cleanup)
-        if len(image_files)>= MAX_FRAME:
-            print(f'图片数量高于MAX_FRAME={MAX_FRAME},切片运行')
-            for i in range(0, len(image_files), MAX_FRAME):
-                print(f'正在运行第{i}至{i+MAX_FRAME}张')
-                chunk = image_files[i:i + MAX_FRAME]
+        if len(image_files)>= max_frame:
+            print(f'图片数量高于MAX_FRAME={max_frame},切片运行')
+            for i in range(0, len(image_files), max_frame):
+                print(f'正在运行第{i}至{i+max_frame}张')
+                chunk = image_files[i:i + max_frame]
                 run_inference(
                 image_paths=chunk,
                 export_dir=export_dir,
