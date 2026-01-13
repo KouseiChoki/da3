@@ -262,9 +262,9 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
                 export_kwargs["exr"].update(
                     {
                         # "image_paths": image,
-                        # "extrinsics": extrinsics, 
-                        # "intrinsics": intrinsics,
                         "orig_hw": orig_hw, 
+                        "conf_thresh_percentile": conf_thresh_percentile,
+                        "process_res_method": process_res_method,
                     }
                 )
             self._export_results(prediction, export_format, export_dir, **export_kwargs)

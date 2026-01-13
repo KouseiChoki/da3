@@ -153,7 +153,7 @@ def auto(
     ),
     # Feat_vis export options
     feat_vis_fps: int = typer.Option(15, help="[FEAT_VIS] Frame rate for output video"),
-    max_frame:int = 10
+    maxframe:int = 200
 ):
     """
     Automatically detect input type and run appropriate processing.
@@ -220,11 +220,11 @@ def auto(
 
         # Handle export directory
         export_dir = InputHandler.handle_export_dir(export_dir, auto_cleanup)
-        if len(image_files)>= max_frame:
-            print(f'图片数量高于MAX_FRAME={max_frame},切片运行')
-            for i in range(0, len(image_files), max_frame):
-                print(f'正在运行第{i}至{i+max_frame}张')
-                chunk = image_files[i:i + max_frame]
+        if len(image_files)>= maxframe:
+            print(f'图片数量高于MAX_FRAME={maxframe},切片运行')
+            for i in range(0, len(image_files), maxframe):
+                print(f'正在运行第{i}至{i+maxframe}张')
+                chunk = image_files[i:i + maxframe]
                 run_inference(
                 image_paths=chunk,
                 export_dir=export_dir,
@@ -238,7 +238,7 @@ def auto(
                 conf_thresh_percentile=conf_thresh_percentile,
                 num_max_points=num_max_points,
                 show_cameras=show_cameras,
-                feat_vis_fps=feat_vis_fps,
+                feat_vis_fps=feat_vis_fps
             )
         else:
         # Run inference
