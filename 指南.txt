@@ -4,3 +4,11 @@ conda create -n da3 python=3.10
 ./install_macos.sh
 3.运行指令（首次运行会下载8gb模型）：
 da3 auto 目标文件夹 --device mps --export-dir 输出文件夹 --export-format exr --process-res 504 --maxframe 50
+
+
+
+
+注:
+macos有内存限制：
+process-res不要超过1k
+process-res为1k的情况下maxframe不能超过10，否则会炸内存
