@@ -46,6 +46,51 @@ SAFETENSORS_NAME = "model.safetensors"
 CONFIG_NAME = "config.json"
 
 
+
+def gethw(x):
+    """
+    输入:
+      - str: 图片路径
+      - np.ndarray: 图像数组
+      - torch.Tensor: 图像 tensor
+
+    返回:
+      (H, W)
+    """
+    # 情况 1：字符串 → 读图片
+    if isinstance(x, str):
+        img = Image.open(x)
+        w, h = img.size
+        return h, w
+
+    # # 情况 2：torch Tensor
+    # if isinstance(x, torch.Tensor):
+    #     # 常见形状: [H, W], [C, H, W], [H, W, C], [B, C, H, W]
+    #     shape = x.shape
+    #     if x.ndim == 2:
+    #         h, w = shape
+    #     elif x.ndim == 3:
+    #         h, w = shape[-2], shape[-1]
+    #     elif x.ndim == 4:
+    #         h, w = shape[-2], shape[-1]
+    #     else:
+    #         raise ValueError(f"Unsupported tensor shape: {shape}")
+    #     return int(h), int(w)
+
+    # 情况 3：numpy array
+    if isinstance(x, np.ndarray):
+        # 常见: [H, W], [H, W, C], [C, H, W]
+        shape = x.shape
+        if x.ndim == 2:
+            h, w = shape
+        elif x.ndim == 3:
+            h, w = shape[:2] if shape[2] <= 4 else shape[1:]
+        else:
+            raise ValueError(f"Unsupported ndarray shape: {shape}")
+        return int(h), int(w)
+
+    raise TypeError(f"Unsupported input type: {type(x)}")
+
 class DepthAnything3(nn.Module, PyTorchModelHubMixin):
     """
     Depth Anything 3 main API class.
@@ -247,8 +292,24 @@ class DepthAnything3(nn.Module, PyTorchModelHubMixin):
                         "fps": feat_vis_fps,
                     }
                 )
+
+            # Add exr export parameters
+            if "exr" in export_format:
+                if "exr" not in export_kwargs:
+                    export_kwargs["exr"] = {}
+                orig_hw = gethw(image[0])
+                export_kwargs["exr"].update(
+                    {
+                        # "image_paths": image,
+                        "orig_hw": orig_hw, 
+                        "conf_thresh_percentile": conf_thresh_percentile,
+                        "process_res_method": process_res_method,
+                    }
+                )
+
             self._export_results(prediction, export_format, export_dir, timing=timing, **export_kwargs)
 
+            
         # Attach timing to prediction if collected
         if timing is not None:
             timing.compute_totals()

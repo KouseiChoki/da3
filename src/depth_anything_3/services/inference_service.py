@@ -78,7 +78,7 @@ class InferenceService:
         # not dense video frame processing. The transformer attention has O(N^2) memory.
         # Recommended max views: 2-24 images depending on device.
         if self.device == "mps":
-            max_views = 12  # MPS architectural limit
+            max_views = 600  # MPS architectural limit
         elif self.device == "cuda":
             max_views = 24  # CUDA can handle more
         else:  # CPU

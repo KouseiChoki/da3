@@ -19,7 +19,7 @@ from .depth_vis import export_to_depth_vis
 from .feat_vis import export_to_feat_vis
 from .glb import export_to_glb
 from .npz import export_to_mini_npz, export_to_npz
-
+from .exr import export_to_exr
 
 def export(
     prediction: Prediction,
@@ -47,6 +47,8 @@ def export(
         export_to_gs_ply(prediction, export_dir, **kwargs.get(export_format, {}))
     elif export_format == "gs_video":
         export_to_gs_video(prediction, export_dir, **kwargs.get(export_format, {}))
+    elif export_format == 'exr':
+        export_to_exr(prediction, export_dir, **kwargs.get(export_format, {}))
     else:
         raise ValueError(f"Unsupported export format: {export_format}")
 

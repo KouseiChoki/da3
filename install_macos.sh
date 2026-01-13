@@ -6,14 +6,14 @@ set -e  # Exit on error
 echo "🍎 Installing Depth Anything 3 for macOS with MPS support..."
 echo ""
 
-# Check if we're in a virtual environment
-if [ -z "$VIRTUAL_ENV" ]; then
-    echo "⚠️  Warning: Not in a virtual environment. Activate .venv first:"
-    echo "   source .venv/bin/activate"
-    exit 1
-fi
+# # Check if we're in a virtual environment
+# if [ -z "$VIRTUAL_ENV" ]; then
+#     echo "⚠️  Warning: Not in a virtual environment. Activate .venv first:"
+#     echo "   source .venv/bin/activate"
+#     exit 1
+# fi
 
-echo "✓ Virtual environment detected: $VIRTUAL_ENV"
+# echo "✓ Virtual environment detected: $VIRTUAL_ENV"
 
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -43,7 +43,7 @@ echo ""
 echo "🔍 Verifying installation..."
 
 # Test gsplat
-if python -c "import gsplat; from gsplat import rasterization" 2>/dev/null; then
+if python -c "import gsplat; from gsplat import rasterize_gaussians" 2>/dev/null; then
     echo "✓ gsplat (MPS version) installed successfully"
 else
     echo "❌ Error: gsplat import failed"

@@ -217,7 +217,7 @@ class DPT(nn.Module):
         for stage_idx, take_idx in enumerate(self.intermediate_layer_idx):
             x = feats[take_idx][:, patch_start_idx:]  # [B*S, N_patch, C]
             x = self.norm(x)
-            x = x.permute(0, 2, 1).reshape(B, C, ph, pw)  # [B*S, C, ph, pw]
+            x = x.permute(0, 2, 1).contiguous().view(B, C, ph, pw)  # [B*S, C, ph, pw]
 
             x = self.projects[stage_idx](x)
             if self.pos_embed:
