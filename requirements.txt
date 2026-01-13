@@ -25,3 +25,4 @@ psutil
 pyyaml
 tqdm
 matplotlib
+pycolmap
